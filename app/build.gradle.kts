@@ -8,7 +8,7 @@ plugins {
 
 // Firebase setup is optional for local builds until the app owner adds app/google-services.json.
 // A separate test installation (-PmeloTestApplicationId) has no Firebase client and sends no analytics.
-if (file("google-services.json").isFile && !project.hasProperty("meloTestApplicationId")) {
+if (providers.gradleProperty("meloEnableFirebase").orNull == "true" && file("google-services.json").isFile && !project.hasProperty("meloTestApplicationId")) {
     apply(plugin = "com.google.gms.google-services")
 }
 
