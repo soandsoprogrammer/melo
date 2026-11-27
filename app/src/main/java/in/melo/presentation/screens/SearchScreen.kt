@@ -122,7 +122,7 @@ fun SearchScreen(
     val appSettings by ui.settings.collectAsStateWithLifecycle()
     val server by model.serverLibrary.collectAsStateWithLifecycle()
     val showSources = appSettings.showSearchSources
-    val searchSources = remember(discovery.spotifyEnabled, discovery.addonsEnabled) {
+    val searchSources = remember(discovery.spotifyEnabled, discovery.addonsEnabled, server) {
         SearchSource.entries.filter {
             (it != SearchSource.Spotify || discovery.spotifyEnabled) && (it != SearchSource.MusicServer || server != null) && (it != SearchSource.Addons || discovery.addonsEnabled)
         }
@@ -235,7 +235,7 @@ fun SearchScreen(
                         ) {
                             MeloSegmentedControl(
                                 options = searchSources.map { stringResource(it.labelRes()) },
-                                selectedIndex = searchSources.indexOf(discovery.activeSource),
+                                selectedIndex = activeSourceIndex,
                                 onSelect = { model.setSearchSource(searchSources[it]) },
                                 modifier = if (fits) Modifier
                                     else Modifier.width(SOURCE_SEGMENT_MIN_WIDTH * searchSources.size),

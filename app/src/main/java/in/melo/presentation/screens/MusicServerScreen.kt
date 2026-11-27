@@ -169,7 +169,7 @@ internal fun MusicServerScreen(
                     if (onAppSettings != null) IconButton(onClick = onAppSettings) {
                         Icon(MeloIcons.Settings, stringResource(R.string.common_settings))
                     }
-                    if (!showForm) {
+                    if (showBackButton && !showForm) {
                         IconButton(onClick = {
                             address = account?.url?.toString().orEmpty()
                             username = account?.username.orEmpty()

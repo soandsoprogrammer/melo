@@ -217,6 +217,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
     private val mutableServerPlaylists = MutableStateFlow<List<Music>>(emptyList())
     val serverPlaylists = mutableServerPlaylists.asStateFlow()
     private val serverStars = MutableStateFlow<List<Music>>(emptyList())
+    val serverFavorites = serverStars.asStateFlow()
     val favorites = kotlinx.coroutines.flow.combine(savedIds, serverStars) { spotify, server -> spotify + server.map(Music::id) }
         .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.Eagerly, emptySet())
     private var serverListsJob: Job? = null

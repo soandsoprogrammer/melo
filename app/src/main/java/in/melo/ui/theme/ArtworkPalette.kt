@@ -185,7 +185,7 @@ private val accentSwatchCache = LruCache<String, Color>(128)
 private suspend fun loadAccentSwatch(context: Context, url: String): Color? = withContext(Dispatchers.IO) {
     accentSwatchCache.get(url)?.let { return@withContext it }
     val request = ImageRequest.Builder(context)
-        .data(`in`.melo.presentation.screens.dialArtwork(url) ?: url)
+        .data(`in`.melo.data.largestSpotifyImage(url) ?: url)
         .allowHardware(false)
         .size(Size(ACCENT_PALETTE_PX, ACCENT_PALETTE_PX))
         .bitmapConfig(Bitmap.Config.ARGB_8888)

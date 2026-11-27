@@ -300,7 +300,7 @@
     <string name="local_file_missing">“%1$s” is not on this device.</string>
     <string name="continue_without_account">Continue without an account</string>
     <string name="settings_account_signin_title">Sign in to Spotify</string>
-    <string name="settings_account_signin_subtitle">Spotify tracks play from music server until you sign in.</string>
+    <string name="settings_account_signin_subtitle">Open your Spotify catalog and playlists. Playback uses matching tracks on your music server.</string>
     <string name="settings_account_guest_subtitle">Not signed in</string>
     <string name="playlist_delete_spotify_confirm">Delete “%1$s” from your Spotify library?</string>
     <string name="playlist_deleted">“%1$s” deleted</string>
@@ -308,13 +308,13 @@
     <string name="playlist_exported">Playlist exported</string>
     <string name="playlist_import">Import a playlist</string>
     <string name="import_from_file">CSV file exported by Melo</string>
-    <string name="import_from_link">Spotify link</string>
+    <string name="import_from_link">Spotify playlist link</string>
     <string name="import_link_label">Playlist link</string>
     <string name="import_action">Import</string>
     <string name="import_running">Importing…</string>
     <string name="import_done">“%1$s” imported: %2$d tracks</string>
     <string name="import_no_tracks">No tracks to import.</string>
-    <string name="import_unknown_link">This link is not a Spotify playlist.</string>
+    <string name="import_unknown_link">This is not a recognized Spotify playlist link.</string>
     <string name="spotify_link_unavailable">Melo couldn’t open this Spotify link.</string>
     <string name="share_spotify_link">Open Spotify link in Melo</string>
     <string name="settings_link_handling_section">Link handling</string>
@@ -438,7 +438,7 @@
     <string name="settings_player_menu_title">Options button in the player</string>
     <string name="settings_player_menu_subtitle">Show track options in the player.</string>
     <string name="settings_normalization_title">Normalize volume</string>
-    <string name="settings_normalization_subtitle">Plays tracks at a similar loudness, from the values Spotify and music server publish. Local files are not changed.</string>
+    <string name="settings_normalization_subtitle">Use available loudness metadata to keep playback volume consistent.</string>
     <string name="settings_mini_swipe_title">Swipe on the mini player</string>
     <string name="settings_mini_swipe_subtitle">Left and right on the bar at the bottom of the screen. Left plays the next track, right the previous one.</string>
     <string name="settings_mini_swipe_tracks">Change track</string>

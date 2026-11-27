@@ -77,11 +77,12 @@ fun AddTracksSheet(
     var offset by remember(query, source, serverLibrary) { mutableStateOf(0) }
     var more by remember(query, source, serverLibrary) { mutableStateOf(false) }
     var error by remember(query, source, serverLibrary) { mutableStateOf(false) }
+    var retry by remember(query, source, serverLibrary) { mutableStateOf(0) }
     var added by remember { mutableStateOf<Set<String>>(emptySet()) }
     var adding by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val failed = stringResource(R.string.playlist_add_failed)
-    LaunchedEffect(query, source, serverLibrary, offset) {
+    LaunchedEffect(query, source, serverLibrary, offset, retry) {
         if (source == null || (query.isBlank() && source == MeloModel.TRACKS_SPOTIFY)) return@LaunchedEffect
         loading = true
         error = false
@@ -110,7 +111,11 @@ fun AddTracksSheet(
                 onSelect = { selectedSource = sources[it].first },
             )
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
-            if (error) Text(stringResource(R.string.search_request_interrupted), color = MaterialTheme.colorScheme.error)
+            if (source == null) Text(stringResource(R.string.music_server_description))
+            if (error) {
+                Text(stringResource(R.string.search_request_interrupted), color = MaterialTheme.colorScheme.error)
+                TextButton(onClick = { retry++ }) { Text(stringResource(R.string.music_server_retry)) }
+            }
             LazyColumn(Modifier.fillMaxWidth().heightIn(min = 240.dp, max = 520.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 items(results, key = { it.id }) { track ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {

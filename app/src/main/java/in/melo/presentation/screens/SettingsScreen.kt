@@ -168,7 +168,6 @@ fun SettingsScreen(model: MeloModel, navController: NavHostController) {
         }
         SettingsSection(title = stringResource(R.string.settings_group_look)) {
             CategoryRow(stringResource(R.string.settings_category_appearance_title), stringResource(R.string.settings_category_appearance_subtitle), MeloIcons.Palette) { open("appearance") }
-            CategoryRow(stringResource(R.string.settings_home_title), stringResource(R.string.settings_home_subtitle), MeloIcons.Home) { open("home") }
             CategoryRow(stringResource(R.string.settings_pages_title), stringResource(R.string.settings_pages_subtitle), MeloIcons.Tune) { open("pages") }
         }
         SettingsSection(title = stringResource(R.string.settings_group_listening)) {
@@ -219,7 +218,6 @@ fun SettingsCategoryScreen(model: MeloModel, navController: NavHostController, c
         "audio_cache" -> AudioCacheScreen(model, navController)
         "backup" -> BackupSettings(model, navController)
         "account" -> AccountSettings(model, navController)
-        "home" -> HomeSettings(model, navController)
         "pages" -> PageActionsSettings(model, navController)
         "diagnostics" -> DiagnosticsSettings(model, navController)
         "privacy" -> PrivacySettings(model, navController)

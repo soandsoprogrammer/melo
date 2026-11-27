@@ -22,7 +22,7 @@
     <string name="discord_activity">活动</string>
     <string name="discord_name">名称</string>
     <string name="discord_buttons">按钮</string>
-    <string name="discord_buttons_footer">{song_name}、{artist_name} 和 {album_name} 会替换为曲目信息。第一个按钮在 音乐服务器 中打开歌曲，第二个按钮打开项目主页。</string>
+    <string name="discord_buttons_footer">有可分享的 Spotify 曲目时，第一个按钮会打开曲目。第二个按钮打开项目主页。</string>
     <string name="discord_first_button">第一个按钮</string>
     <string name="discord_second_button">第二个按钮</string>
     <string name="discord_preview">预览</string>

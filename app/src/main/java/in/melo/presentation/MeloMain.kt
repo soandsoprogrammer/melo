@@ -106,10 +106,13 @@ fun MeloMain(model: MeloModel, pendingSharedLink: String? = null, onSharedLinkHa
         return
     }
     var returnedFromBackground by remember { mutableStateOf(false) }
+    var appInForeground by remember { mutableStateOf(true) }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        appInForeground = false
         returnedFromBackground = true
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        appInForeground = true
         if (returnedFromBackground) model.refreshLibrary()
         returnedFromBackground = false
     }

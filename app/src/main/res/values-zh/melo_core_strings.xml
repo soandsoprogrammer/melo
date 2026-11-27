@@ -300,7 +300,7 @@
     <string name="local_file_missing">此设备上没有「%1$s」。</string>
     <string name="continue_without_account">跳过登录</string>
     <string name="settings_account_signin_title">登录 Spotify</string>
-    <string name="settings_account_signin_subtitle">登录前，Spotify 曲目通过 音乐服务器 播放。</string>
+    <string name="settings_account_signin_subtitle">访问你的 Spotify 曲库和歌单，播放时从音乐服务器匹配音频。</string>
     <string name="settings_account_guest_subtitle">未登录</string>
     <string name="playlist_delete_spotify_confirm">从 Spotify 曲库中删除「%1$s」？</string>
     <string name="playlist_deleted">已删除「%1$s」</string>
@@ -308,13 +308,13 @@
     <string name="playlist_exported">已导出歌单</string>
     <string name="playlist_import">导入歌单</string>
     <string name="import_from_file">Melo 导出的 CSV 文件</string>
-    <string name="import_from_link">音乐服务器、音乐服务器 或 Spotify 链接</string>
+    <string name="import_from_link">Spotify 歌单链接</string>
     <string name="import_link_label">歌单链接</string>
     <string name="import_action">导入</string>
     <string name="import_running">正在导入…</string>
     <string name="import_done">已导入「%1$s」，共 %2$d 首曲目</string>
     <string name="import_no_tracks">没有可导入的曲目。</string>
-    <string name="import_unknown_link">此链接不是 音乐服务器、音乐服务器 或 Spotify 歌单。</string>
+    <string name="import_unknown_link">无法识别此 Spotify 歌单链接。</string>
     <string name="spotify_link_unavailable">Melo 无法打开此 Spotify 链接。</string>
     <string name="share_spotify_link">在 Melo 中打开 Spotify 链接</string>
     <string name="settings_link_handling_section">链接处理</string>
@@ -436,7 +436,7 @@
     <string name="settings_player_menu_title">播放页选项按钮</string>
     <string name="settings_player_menu_subtitle">在播放器中显示曲目选项。</string>
     <string name="settings_normalization_title">音量均衡</string>
-    <string name="settings_normalization_subtitle">根据 Spotify 和 音乐服务器 提供的音量信息，使曲目响度接近。本地文件不受影响。</string>
+    <string name="settings_normalization_subtitle">使用已有响度数据，让曲目播放音量更一致。</string>
     <string name="settings_mini_swipe_title">迷你播放器滑动手势</string>
     <string name="settings_mini_swipe_subtitle">在屏幕底部的播放器上左右滑动。左滑播放下一首，右滑播放上一首。</string>
     <string name="settings_mini_swipe_tracks">切换曲目</string>

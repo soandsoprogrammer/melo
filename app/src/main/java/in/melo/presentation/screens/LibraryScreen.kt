@@ -136,6 +136,7 @@ import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 private val accountTabs = listOf(LibraryTabId.PLAYLISTS, LibraryTabId.LIKED, LibraryTabId.ALBUMS, LibraryTabId.ARTISTS, LibraryTabId.LOCAL, LibraryTabId.DOWNLOADS)
 /** Without a Spotify account there are no liked songs, saved albums or followed artists. */
 private val guestTabs = listOf(LibraryTabId.PLAYLISTS, LibraryTabId.LOCAL, LibraryTabId.DOWNLOADS)
+private val serverTabs = listOf(LibraryTabId.PLAYLISTS, LibraryTabId.LIKED, LibraryTabId.LOCAL, LibraryTabId.DOWNLOADS)
 
 private fun sortOptions(tab: LibraryTabId): List<SortOption> = when (tab) {
     LibraryTabId.PLAYLISTS -> listOf(SortOption.SongDefaultOrder, SortOption.PlaylistNameAZ, SortOption.PlaylistNameZA)
@@ -182,7 +183,12 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
     val stable by ui.stablePlayerState.collectAsStateWithLifecycle()
     val discovery by model.discovery.collectAsStateWithLifecycle()
     val spotifyProfile by model.spotifyAccountProfile.collectAsStateWithLifecycle()
-    val libraryTabs = if (discovery.spotifyEnabled) accountTabs else guestTabs
+    val serverLibrary by model.serverLibrary.collectAsStateWithLifecycle()
+    val libraryTabs = when {
+        discovery.spotifyEnabled -> accountTabs
+        serverLibrary != null -> serverTabs
+        else -> guestTabs
+    }
     var savedTab by rememberSaveable { mutableStateOf(0) }
     val pagerState = rememberPagerState(initialPage = savedTab.coerceIn(0, libraryTabs.lastIndex)) { libraryTabs.size }
     val tabRowState = rememberLazyListState()
@@ -216,13 +222,21 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
     var creatingPlaylist by remember { mutableStateOf(false) }
     val localPlaylists by model.localPlaylists.collectAsStateWithLifecycle()
     val serverPlaylists by model.serverPlaylists.collectAsStateWithLifecycle()
+    val serverFavorites by model.serverFavorites.collectAsStateWithLifecycle()
     val localTracks by model.localTracks.collectAsStateWithLifecycle()
     val localTitle = stringResource(R.string.library_tab_local)
     val downloads by ui.downloads.collectAsStateWithLifecycle()
     val downloadCollections by ui.downloadCollections.collectAsStateWithLifecycle()
     val downloadsTitle = stringResource(R.string.library_tab_downloads)
     val searchQuery = librarySearchQuery.trim()
-    val content = library.content
+    val content = remember(library.content, serverFavorites) {
+        library.content?.let { library ->
+            library.copy(savedTracks = serverFavorites + library.savedTracks,
+                savedTrackCount = serverFavorites.size + library.savedTrackCount,
+                savedTrackUris = serverFavorites.map(Music::id) + library.savedTrackUris,
+                savedTracksLoaded = serverFavorites.size + library.savedTracksLoaded)
+        }
+    }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { savedTab = it }

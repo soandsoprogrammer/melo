@@ -500,7 +500,7 @@
     <string name="onboarding_history_title">播放记录</string>
     <string name="onboarding_history_body">播放记录按时间倒序显示。有新版本时，这里会显示更新箭头。</string>
     <string name="onboarding_profile_title">账号与设置</string>
-    <string name="onboarding_profile_body">在个人资料中连接 Spotify 和 音乐服务器，或打开设置。</string>
+    <string name="onboarding_profile_body">在设置里连接音乐服务器和管理账号。</string>
     <string name="onboarding_library_title">你的曲库</string>
     <string name="onboarding_library_body">歌单、专辑、歌手、下载和手机里的音乐都集中在这里。</string>
     <string name="onboarding_finish_title">准备就绪</string>

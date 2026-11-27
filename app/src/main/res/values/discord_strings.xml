@@ -22,7 +22,7 @@
     <string name="discord_activity">Activity</string>
     <string name="discord_name">Name</string>
     <string name="discord_buttons">Buttons</string>
-    <string name="discord_buttons_footer">{song_name}, {artist_name} and {album_name} are replaced with the track. The first button opens the song on music server and the second opens this project.</string>
+    <string name="discord_buttons_footer">The first button opens Spotify links when available. The second opens the project.</string>
     <string name="discord_first_button">First button</string>
     <string name="discord_second_button">Second button</string>
     <string name="discord_preview">Preview</string>

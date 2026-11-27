@@ -300,7 +300,7 @@
     <string name="local_file_missing">« %1$s » n’est pas sur cet appareil.</string>
     <string name="continue_without_account">Continuer sans compte</string>
     <string name="settings_account_signin_title">Se connecter à Spotify</string>
-    <string name="settings_account_signin_subtitle">Les morceaux Spotify sont lus depuis serveur de musique tant que vous n’êtes pas connecté.</string>
+    <string name="settings_account_signin_subtitle">Ouvrez votre catalogue Spotify et vos listes. La lecture utilise les titres correspondants de votre serveur.</string>
     <string name="settings_account_guest_subtitle">Non connecté</string>
     <string name="playlist_delete_spotify_confirm">Supprimer « %1$s » de votre bibliothèque Spotify ?</string>
     <string name="playlist_deleted">« %1$s » supprimée</string>
@@ -308,13 +308,13 @@
     <string name="playlist_exported">Playlist exportée</string>
     <string name="playlist_import">Importer une playlist</string>
     <string name="import_from_file">Fichier CSV exporté par Melo</string>
-    <string name="import_from_link">Lien serveur de musique, serveur de musique ou Spotify</string>
+    <string name="import_from_link">Lien vers une liste Spotify</string>
     <string name="import_link_label">Lien de la playlist</string>
     <string name="import_action">Importer</string>
     <string name="import_running">Importation…</string>
     <string name="import_done">« %1$s » importée : %2$d morceaux</string>
     <string name="import_no_tracks">Aucun morceau à importer.</string>
-    <string name="import_unknown_link">Ce lien n’est pas une playlist serveur de musique, serveur de musique ou Spotify.</string>
+    <string name="import_unknown_link">Ce lien ne correspond pas à une liste Spotify.</string>
     <string name="spotify_link_unavailable">Melo n’a pas pu ouvrir ce lien Spotify.</string>
     <string name="share_spotify_link">Ouvrir le lien Spotify dans Melo</string>
     <string name="settings_link_handling_section">Gestion des liens</string>
@@ -438,7 +438,7 @@
     <string name="settings_player_menu_title">Bouton d’options dans le lecteur</string>
     <string name="settings_player_menu_subtitle">Afficher les options du titre dans le lecteur.</string>
     <string name="settings_normalization_title">Normaliser le volume</string>
-    <string name="settings_normalization_subtitle">Joue les titres à un volume comparable, d’après les valeurs publiées par Spotify et serveur de musique. Les fichiers locaux ne changent pas.</string>
+    <string name="settings_normalization_subtitle">Utilise les données de sonie disponibles pour équilibrer le volume de lecture.</string>
     <string name="settings_mini_swipe_title">Balayage du mini-lecteur</string>
     <string name="settings_mini_swipe_subtitle">Vers la gauche ou la droite sur la barre en bas de l’écran. À gauche le titre suivant, à droite le précédent.</string>
     <string name="settings_mini_swipe_tracks">Changer de titre</string>
