@@ -31,7 +31,8 @@ object PlaylistCsv {
         fun List<String>.at(column: String) = columns.getValue(column).takeIf { it >= 0 }?.let(::getOrNull)?.trim().orEmpty()
         val tracks = rows.drop(1).mapNotNull { row ->
             val id = row.at("id").ifBlank { return@mapNotNull null }
-            val valid = id.startsWith("spotify:track:") || id.startsWith(YTM_TRACK_PREFIX) || isLocalTrackId(id)
+            val valid = id.startsWith("spotify:track:") || id.startsWith(YTM_TRACK_PREFIX) || isLocalTrackId(id) ||
+                `in`.melo.data.server.MusicServerUris.isTrack(id)
             if (!valid) return@mapNotNull null
             Music(
                 id = id, title = row.at("title").ifBlank { id.substringAfterLast(':') }, subtitle = row.at("artists"),
@@ -48,6 +49,7 @@ object PlaylistCsv {
         MusicSource.YouTubeMusic -> "youtube_music"
         MusicSource.Local -> "local"
         MusicSource.Addon -> "addon"
+        MusicSource.MusicServer -> "music_server"
     }
 
     private fun link(track: Music): String = when {

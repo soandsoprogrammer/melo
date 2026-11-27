@@ -1,5 +1,7 @@
 package `in`.melo.data
 
+import `in`.melo.data.server.MusicServerUris
+
 enum class MusicKind(val label: String) {
     Track("Track"), Album("Album"), Playlist("Playlist"), Artist("Artist"), Radio("Radio")
 }
@@ -25,11 +27,12 @@ data class Music(
 )
 
 /** Where a track's audio comes from. */
-enum class MusicSource { Local, Spotify, YouTubeMusic, Addon }
+enum class MusicSource { Local, Spotify, YouTubeMusic, Addon, MusicServer }
 
 val Music.source: MusicSource get() = musicSourceOf(id)
 
 fun musicSourceOf(id: String): MusicSource = when {
+    MusicServerUris.isTrack(id) -> MusicSource.MusicServer
     isLocalTrackId(id) -> MusicSource.Local
     `in`.melo.data.addons.AddonUris.isAddonTrack(id) -> MusicSource.Addon
     id.startsWith(`in`.melo.data.youtube.YTM_TRACK_PREFIX) || id.startsWith(`in`.melo.data.youtube.YTM_ALBUM_PREFIX) ||

@@ -40,8 +40,8 @@ jobs:
         run: bash scripts/check-ui-tokens.sh
 
       # Compiles the app, runs the JVM tests and lint.
-      - name: Build, test and lint
-        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+      - name: Compile debug, release and device tests
+        run: ./gradlew --no-daemon :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest
 
       - name: Upload test and lint reports
         if: always()
@@ -58,3 +58,26 @@ jobs:
         with:
           name: melo-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Stage release APK for local signing
+        run: |
+          mkdir signing-input
+          cp app/build/outputs/apk/release/app-release-unsigned.apk signing-input/Melo-unsigned.apk
+          (cd signing-input && sha256sum Melo-unsigned.apk > SHA256SUMS.txt)
+
+      - name: Upload unsigned release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: melo-unsigned
+          path: signing-input/
+          if-no-files-found: error
+
+      - name: Upload device test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: melo-device-tests
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          if-no-files-found: error
+
+      - name: Test and lint
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug

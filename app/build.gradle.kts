@@ -12,15 +12,17 @@ if (file("google-services.json").isFile && !project.hasProperty("meloTestApplica
     apply(plugin = "com.google.gms.google-services")
 }
 
-val updateRepository = providers.gradleProperty("meloUpdateRepository").getOrElse("aarush-io/melo")
+val updateRepository = providers.gradleProperty("meloUpdateRepository").getOrElse("")
 require(updateRepository.isEmpty() || updateRepository.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) {
     "meloUpdateRepository must be owner/repository"
 }
 val statsEndpoint = providers.gradleProperty("meloStatsEndpoint")
-    .getOrElse("https://api.melo.aarushsagar.com/api/presence")
+    .getOrElse("")
 require(statsEndpoint.isEmpty() || statsEndpoint.matches(Regex("https://[A-Za-z0-9.-]+/api/presence"))) {
     "meloStatsEndpoint must be an HTTPS /api/presence URL"
 }
+
+val forkBuild = providers.environmentVariable("GITHUB_RUN_NUMBER").orElse("1").get().toInt()
 
 val releaseSigningFile = rootProject.file(".signing/melo-release.properties")
 val releaseSigning = Properties().apply {
@@ -33,11 +35,11 @@ android {
 
     defaultConfig {
         // A separate installation keeps the regular account and downloads intact during device tests.
-        applicationId = providers.gradleProperty("meloTestApplicationId").getOrElse("in.melo")
+        applicationId = providers.gradleProperty("meloTestApplicationId").getOrElse("app.shenye.melo")
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.3.1"
+        versionCode = 100000 + forkBuild
+        versionName = "1.3.1-shenye.$forkBuild"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // A fork must never offer the upstream APK as an update.
         buildConfigField("String", "UPDATE_REPOSITORY", "\"$updateRepository\"")

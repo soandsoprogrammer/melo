@@ -2,6 +2,8 @@ package `in`.melo.data.repository
 
 import android.content.Context
 import `in`.melo.data.SpotifyLyricsSource
+import `in`.melo.data.server.MusicServer
+import `in`.melo.data.server.MusicServerUris
 import `in`.melo.data.model.Lyrics
 import `in`.melo.data.model.Song
 import `in`.melo.utils.LyricsUtils
@@ -44,6 +46,7 @@ class LyricsRepository(context: Context) {
             chain.proceed(chain.request())
         }.build()
     private val providers = LyricsProviders(client)
+    private val app = context.applicationContext
 
     private fun cacheFile(songId: String): File {
         val name = MessageDigest.getInstance("SHA-256").digest(songId.toByteArray()).joinToString("") { "%02x".format(it) }
@@ -70,6 +73,15 @@ class LyricsRepository(context: Context) {
         enabled: List<LyricsProvider>,
         show: (Lyrics) -> Unit = {},
     ): Lyrics? = coroutineScope {
+        if (MusicServerUris.isTrack(song.id)) {
+            // Private library metadata is sent only to the configured server.
+            val raw = try {
+                MusicServer.get(app).lyrics(song.id)
+            } catch (_: IOException) {
+                null
+            }
+            return@coroutineScope raw?.let(LyricsUtils::parseLyrics)?.takeIf(::hasContent)
+        }
         val query = LyricsQuery(song.title, song.artist, song.album, (song.duration / 1000).toInt())
         val asks = buildList<suspend () -> String?> {
             if (!song.isLocal && spotify != null) add { runCatching { spotify.fetch(song.id)?.toStoredText() }.getOrNull() }

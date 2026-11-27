@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="music_server_title">Serveur de musique</string>
+    <string name="music_server_back">Retour</string>
+    <string name="music_server_settings">Paramètres du serveur</string>
+    <string name="music_server_description">Connectez-vous à votre bibliothèque avec le compte de votre serveur.</string>
+    <string name="music_server_address">Adresse du serveur (HTTPS)</string>
+    <string name="music_server_username">Nom d’utilisateur</string>
+    <string name="music_server_password">Mot de passe</string>
+    <string name="music_server_connect">Se connecter</string>
+    <string name="music_server_disconnect">Se déconnecter</string>
+    <string name="music_server_search">Rechercher sur le serveur</string>
+    <string name="music_server_clear_search">Effacer la recherche</string>
+    <string name="music_server_albums">Albums</string>
+    <string name="music_server_songs">Titres</string>
+    <string name="music_server_retry">Réessayer</string>
+    <string name="music_server_empty">Aucun titre trouvé.</string>
+    <string name="music_server_more">Afficher plus</string>
+    <string name="music_server_error_address">Saisissez une adresse HTTPS valide.</string>
+    <string name="music_server_error_credentials">Vérifiez votre nom d’utilisateur et votre mot de passe.</string>
+    <string name="music_server_error_connection">Serveur inaccessible. Vérifiez l’adresse et votre connexion.</string>
+    <string name="music_server_error_response">Le serveur n’a pas pu traiter la demande.</string>
+</resources>

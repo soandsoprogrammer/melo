@@ -1981,7 +1981,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
      */
     fun playWithRadio(track: Music) {
         play(listOf(track), 0)
-        if (track.isLocalTrack || !online.value) return
+        if (track.isLocalTrack || `in`.melo.data.server.MusicServerUris.isTrack(track.id) || !online.value) return
         upNextJob = viewModelScope.launch {
             try {
                 player.extendContext(track.id, upNext(track))
@@ -1993,6 +1993,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
     /** The tracks that follow [seed] when nothing else was chosen: its radio, without the seed itself. */
     private suspend fun upNext(seed: Music): List<Music> {
+        if (seed.source == `in`.melo.data.MusicSource.MusicServer) return emptyList()
         if (seed.source == `in`.melo.data.MusicSource.YouTubeMusic ||
             (seed.source == `in`.melo.data.MusicSource.Spotify && catalog == null)) {
             val videoId = seed.youTubeVideoId ?: withContext(Dispatchers.IO) {

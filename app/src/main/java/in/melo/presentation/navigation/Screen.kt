@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     object Explore : Screen("explore")
     object Search : Screen("search")
     object Library : Screen("library")
+    object MusicServer : Screen("music_server")
     object Podcasts : Screen("podcasts")
     object PodcastDetail : Screen("podcast_detail/{browseId}") {
         fun createRoute(browseId: String) = "podcast_detail/${URLEncoder.encode(browseId, "UTF-8")}"

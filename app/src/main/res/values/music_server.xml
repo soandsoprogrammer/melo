@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="music_server_title">Music Server</string>
+    <string name="music_server_back">Back</string>
+    <string name="music_server_settings">Server settings</string>
+    <string name="music_server_description">Connect to your music library using your server account.</string>
+    <string name="music_server_address">Server address (HTTPS)</string>
+    <string name="music_server_username">Username</string>
+    <string name="music_server_password">Password</string>
+    <string name="music_server_connect">Connect</string>
+    <string name="music_server_disconnect">Disconnect</string>
+    <string name="music_server_search">Search server</string>
+    <string name="music_server_clear_search">Clear search</string>
+    <string name="music_server_albums">Albums</string>
+    <string name="music_server_songs">Songs</string>
+    <string name="music_server_retry">Retry</string>
+    <string name="music_server_empty">No music found.</string>
+    <string name="music_server_more">Load more</string>
+    <string name="music_server_error_address">Enter a valid HTTPS server address.</string>
+    <string name="music_server_error_credentials">Check your server username and password.</string>
+    <string name="music_server_error_connection">Could not reach the server. Check the address and your connection.</string>
+    <string name="music_server_error_response">The server could not complete the request.</string>
+</resources>

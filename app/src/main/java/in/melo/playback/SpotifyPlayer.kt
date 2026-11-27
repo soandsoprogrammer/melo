@@ -524,7 +524,8 @@ internal fun playbackErrorMessage(code: Int): String = when (code) {
 }
 private fun Music.isPlayableTrack(): Boolean = kind == MusicKind.Track &&
     (id.startsWith("spotify:track:") || id.startsWith(`in`.melo.data.youtube.YTM_TRACK_PREFIX) ||
-        `in`.melo.data.addons.AddonUris.isAddonTrack(id) || (isLocalTrack && mediaUri != null))
+        `in`.melo.data.addons.AddonUris.isAddonTrack(id) ||
+        `in`.melo.data.server.MusicServerUris.isTrack(id) || (isLocalTrack && mediaUri != null))
 
 /** Set on the tracks the user queued ("Add to queue", "Play next"). */
 private const val QUEUED = "queued"
@@ -535,7 +536,7 @@ private fun mediaItem(track: Music, queued: Boolean, ceiling: Long?): MediaItem 
     // YouTube Music tracks and Spotify tracks are both read from YouTube Music; add-on rows and device files play directly.
     val youtube = YouTubeUris.of(track)?.let { YouTubeUris.withCeiling(it, ceiling) }
     return MediaItem.Builder().setMediaId(track.id)
-        .setUri(youtube ?: `in`.melo.data.addons.AddonUris.uriOf(track.id) ?: track.mediaUri?.let(Uri::parse) ?: Uri.parse(track.id))
+        .setUri(youtube ?: `in`.melo.data.server.MusicServerUris.stream(track.id) ?: `in`.melo.data.addons.AddonUris.uriOf(track.id) ?: track.mediaUri?.let(Uri::parse) ?: Uri.parse(track.id))
         .apply { if (youtube != null) setCustomCacheKey(YouTubeUris.cacheKey(track.id, ceiling)) }
         .setMediaMetadata(MediaMetadata.Builder().setTitle(track.title).setArtist(track.subtitle)
             .setArtworkUri(`in`.melo.data.largestSpotifyImage(track.imageUrl)?.let(Uri::parse)).setIsPlayable(true).setIsBrowsable(false)

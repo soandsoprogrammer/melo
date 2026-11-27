@@ -68,6 +68,7 @@ class MeloPlaybackService : MediaSessionService() {
             MusicSource.YouTubeMusic -> "youtube_music"
             MusicSource.Local -> "local"
             MusicSource.Addon -> "addon"
+            MusicSource.MusicServer -> "music_server"
         }
         fun recordTrackStart() {
             val id = player.currentMediaItem?.mediaId ?: return

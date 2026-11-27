@@ -230,7 +230,9 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { savedTab = it }
     }
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage in libraryTabs.indices) tabRowState.animateScrollToItem(pagerState.currentPage)
+        if (pagerState.currentPage in libraryTabs.indices) {
+            tabRowState.animateScrollToItem(if (pagerState.currentPage == 0) 0 else pagerState.currentPage + 1)
+        }
     }
 
     val options = remember(currentTab) { sortOptions(currentTab) }
@@ -312,6 +314,14 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
+                    item("music_server") {
+                        MeloChip(
+                            label = stringResource(R.string.music_server_title),
+                            selected = false,
+                            onClick = { navController.navigateSafely(Screen.MusicServer.route) },
+                            onWash = true,
+                        )
+                    }
                     itemsIndexed(libraryTabs, key = { _, tab -> tab.storageKey }) { index, tab ->
                         val selected = pagerState.currentPage == index
                         // The shared chip: glass over the colour background, solid in its colour when chosen.

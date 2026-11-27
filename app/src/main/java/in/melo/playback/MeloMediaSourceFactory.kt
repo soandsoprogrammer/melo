@@ -4,11 +4,17 @@ import android.content.Context
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import `in`.melo.data.NetworkMonitor
+import `in`.melo.data.server.MusicServer
+import `in`.melo.data.server.MusicServerUris
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.OkHttpClient
 import `in`.melo.data.addons.AddonMatcher
 import `in`.melo.data.addons.AddonResolver
 import `in`.melo.data.addons.AddonUris
@@ -26,11 +32,15 @@ internal class MeloMediaSourceFactory(
 ) : MediaSource.Factory {
     private val app = context.applicationContext
     private val addonStreams = AddonStreamSources()
+    private val musicServer = ProgressiveMediaSource.Factory(OkHttpDataSource.Factory(
+        OkHttpClient.Builder().addInterceptor { MusicServer.get(app).resolveMedia(it) }.build()
+    ))
 
     override fun setDrmSessionManagerProvider(provider: DrmSessionManagerProvider): MediaSource.Factory = this
     override fun setLoadErrorHandlingPolicy(policy: LoadErrorHandlingPolicy): MediaSource.Factory {
         files.setLoadErrorHandlingPolicy(policy); youtube.setLoadErrorHandlingPolicy(policy)
         addonStreams.setLoadErrorHandlingPolicy(policy)
+        musicServer.setLoadErrorHandlingPolicy(policy)
         return this
     }
     override fun getSupportedTypes(): IntArray = intArrayOf(C.CONTENT_TYPE_OTHER)
@@ -38,6 +48,9 @@ internal class MeloMediaSourceFactory(
     override fun createMediaSource(item: MediaItem): MediaSource {
         val mediaItem = fullCopyIfKept(item)
         val uri = mediaItem.localConfiguration?.uri
+        if (uri?.toString()?.toHttpUrlOrNull()?.let(MusicServerUris::isRequest) == true) {
+            return musicServer.createMediaSource(mediaItem)
+        }
         AddonUris.parse(uri)?.let { (addonId, trackId) ->
             return AddonMediaSource(mediaItem, { AddonResolver.streamRow(addonId, trackId) }, addonStreams, fallback = null)
         }

@@ -34,6 +34,7 @@ fun SourceBadge(source: MusicSource, modifier: Modifier = Modifier, tint: Color 
         MusicSource.YouTubeMusic -> R.string.source_youtube
         MusicSource.Local -> R.string.source_local
         MusicSource.Addon -> R.string.source_addon
+        MusicSource.MusicServer -> R.string.music_server_title
     })
     val iconModifier = modifier.size(14.dp)
     when (source) {
@@ -41,5 +42,6 @@ fun SourceBadge(source: MusicSource, modifier: Modifier = Modifier, tint: Color 
         MusicSource.YouTubeMusic -> Icon(meloPainter(R.drawable.ic_source_youtube_music), description, iconModifier, tint = tint)
         MusicSource.Local -> Icon(MeloIcons.Folder, description, iconModifier, tint = tint)
         MusicSource.Addon -> Icon(MeloIcons.Link, description, iconModifier, tint = tint)
+        MusicSource.MusicServer -> Icon(MeloIcons.MusicNote, description, iconModifier, tint = tint)
     }
 }

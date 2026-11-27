@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Melo</string>
+    <string name="app_name" translatable="false">Melo · Music Server</string>
     <style name="Theme.Melo" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
         <item name="android:windowLightStatusBar">false</item>

@@ -20,6 +20,7 @@ import `in`.melo.presentation.screens.ArtistDetailScreen
 import `in`.melo.presentation.screens.HomeScreen
 import `in`.melo.presentation.screens.YouTubeExploreScreen
 import `in`.melo.presentation.screens.LibraryScreen
+import `in`.melo.presentation.screens.MusicServerScreen
 import `in`.melo.presentation.screens.PlaylistDetailScreen
 import `in`.melo.presentation.screens.SearchScreen
 import `in`.melo.presentation.screens.EqualizerScreen
@@ -65,6 +66,9 @@ fun AppNavigation(
         composable(Screen.Explore.route) { YouTubeExploreScreen(model, navController, paddingValues) }
         composable(Screen.Search.route) { SearchScreen(model, navController, paddingValues, onSearchBarActiveChange) }
         composable(Screen.Library.route) { LibraryScreen(model, navController, paddingValues) }
+        composable(Screen.MusicServer.route) {
+            MusicServerScreen(model, paddingValues) { navController.popBackStack() }
+        }
         composable(Screen.Podcasts.route) { `in`.melo.presentation.screens.PodcastsScreen(model, navController, paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(model, navController) }
         composable(Screen.History.route) { `in`.melo.presentation.screens.HistoryScreen(model, navController) }

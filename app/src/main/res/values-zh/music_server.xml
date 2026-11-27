@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="music_server_title">音乐服务器</string>
+    <string name="music_server_back">返回</string>
+    <string name="music_server_settings">服务器设置</string>
+    <string name="music_server_description">使用服务器账号连接你的私人曲库。</string>
+    <string name="music_server_address">服务器地址（HTTPS）</string>
+    <string name="music_server_username">用户名</string>
+    <string name="music_server_password">密码</string>
+    <string name="music_server_connect">连接</string>
+    <string name="music_server_disconnect">断开连接</string>
+    <string name="music_server_search">搜索服务器曲库</string>
+    <string name="music_server_clear_search">清除搜索</string>
+    <string name="music_server_albums">专辑</string>
+    <string name="music_server_songs">歌曲</string>
+    <string name="music_server_retry">重试</string>
+    <string name="music_server_empty">没有找到音乐。</string>
+    <string name="music_server_more">加载更多</string>
+    <string name="music_server_error_address">请输入有效的 HTTPS 服务器地址。</string>
+    <string name="music_server_error_credentials">请检查服务器用户名和密码。</string>
+    <string name="music_server_error_connection">无法连接服务器，请检查地址和网络。</string>
+    <string name="music_server_error_response">服务器未能完成请求。</string>
+</resources>
