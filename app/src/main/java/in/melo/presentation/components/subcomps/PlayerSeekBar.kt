@@ -1,5 +1,7 @@
 package `in`.melo.presentation.components.subcomps
 
+import androidx.compose.ui.res.stringResource
+import `in`.melo.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -124,7 +126,7 @@ fun PlayerSeekBar(
             },
             activeTrackColor = primaryColor,
             inactiveTrackColor = primaryColor.copy(alpha = 0.2f),
-            semanticsLabel = "Playback position"
+            semanticsLabel = stringResource(R.string.lyrics_playback_position)
         )
 //        Text(
 //            modifier = Modifier.weight(0.2f),

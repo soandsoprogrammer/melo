@@ -128,7 +128,7 @@ fun AddTracksSheet(
                                     scope.launch {
                                         try { onAddRemote(listOf(track)); added = added + track.id }
                                         catch (cancelled: CancellationException) { throw cancelled }
-                                        catch (failure: Exception) { model.showMessage(failure.message ?: failed) }
+                                        catch (failure: Exception) { model.showMessage(failed) }
                                         finally { adding = null }
                                     }
                                 }

@@ -1,9 +1,11 @@
 package `in`.melo.data
 
+import androidx.annotation.StringRes
+import `in`.melo.R
 import `in`.melo.data.server.MusicServerUris
 
-enum class MusicKind(val label: String) {
-    Track("Track"), Album("Album"), Playlist("Playlist"), Artist("Artist"), Radio("Radio")
+enum class MusicKind(@StringRes val labelRes: Int) {
+    Track(R.string.search_history_kind_track), Album(R.string.search_history_kind_album), Playlist(R.string.search_history_kind_playlist), Artist(R.string.search_history_kind_artist), Radio(R.string.radio)
 }
 
 data class Music(

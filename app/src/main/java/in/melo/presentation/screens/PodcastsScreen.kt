@@ -104,6 +104,7 @@ fun PodcastsScreen(model: MeloModel, navController: NavHostController, paddingVa
     val hasSong by ui.stablePlayerStateHasSongForPodcasts()
     var query by rememberSaveable { mutableStateOf("") }
     var searchShelves by remember { mutableStateOf<List<YouTubePodcastShelf>>(emptyList()) }
+    val searchFailureText = stringResource(R.string.podcasts_search_error_title)
     var searchError by remember { mutableStateOf<String?>(null) }
     var searching by remember { mutableStateOf(false) }
     var searchRetry by rememberSaveable { mutableIntStateOf(0) }
@@ -134,7 +135,7 @@ fun PodcastsScreen(model: MeloModel, navController: NavHostController, paddingVa
             throw cancelled
         } catch (failure: Exception) {
             searchShelves = emptyList()
-            searchError = failure.message ?: "Podcast search failed."
+            searchError = searchFailureText
         } finally {
             if (currentCoroutineContext().isActive) searching = false
         }
@@ -399,6 +400,7 @@ fun PodcastDetailScreen(model: MeloModel, navController: NavHostController, brow
     val ui = model.ui
     var podcast by remember(browseId) { mutableStateOf<YouTubePodcastShow?>(null) }
     var episodeQuery by rememberSaveable(browseId) { mutableStateOf("") }
+    val episodeFailureText = stringResource(R.string.podcasts_episode_load_failed)
     var error by remember(browseId) { mutableStateOf<String?>(null) }
     var loading by remember(browseId) { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
@@ -413,7 +415,7 @@ fun PodcastDetailScreen(model: MeloModel, navController: NavHostController, brow
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (failure: Exception) {
-            error = failure.message ?: "This podcast could not be loaded."
+            error = episodeFailureText
         } finally {
             if (currentCoroutineContext().isActive) {
                 loading = false

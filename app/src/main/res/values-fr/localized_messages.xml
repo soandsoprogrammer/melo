@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_view_label">Affichage de la playlist</string>
+    <string name="palette_tonal_spot">Tons doux</string>
+    <string name="palette_vibrant">Vif</string>
+    <string name="palette_expressive">Expressif</string>
+    <string name="palette_fruit_salad">Salade de fruits</string>
+    <string name="collage_cosmic_swirl">Tourbillon cosmique</string>
+    <string name="collage_honeycomb_groove">Nid d’abeilles</string>
+    <string name="collage_vinyl_stack">Pile de vinyles</string>
+    <string name="collage_pixel_mosaic">Mosaïque de pixels</string>
+    <string name="collage_stardust_scatter">Poussière d’étoiles</string>
+    <string name="playback_error_offline">Ce titre n’est pas disponible hors ligne.</string>
+    <string name="playback_error_connection">La connexion audio a été interrompue. Vérifiez le réseau, puis réessayez.</string>
+    <string name="playback_error_stream">Le flux audio n’est pas disponible. Réessayez dans un instant.</string>
+    <string name="playback_error_authorization">Impossible d’obtenir l’autorisation de lecture. Réessayez.</string>
+    <string name="playback_error_spotify_policy">Spotify n’autorise pas la lecture de ce titre dans cette session.</string>
+    <string name="playback_error_decode">Impossible de décoder le flux audio. Réessayez ou choisissez un autre titre.</string>
+    <string name="playback_error_output">La sortie audio n’a pas pu démarrer. Vérifiez l’appareil audio, puis réessayez.</string>
+    <string name="playback_error_generic">Ce titre ne peut pas être lu. Réessayez ou choisissez un autre titre.</string>
+    <string name="playback_error_youtube_match">Ce titre est introuvable sur YouTube Music.</string>
+    <string name="lyrics_import_error_extension">Seuls les fichiers de paroles .lrc et .ttml sont pris en charge.</string>
+    <string name="lyrics_import_error_type">Le type de fichier sélectionné n’est pas pris en charge.</string>
+    <string name="lyrics_import_error_size">Le fichier de paroles est trop volumineux.</string>
+    <string name="lyrics_import_error_empty">Le fichier de paroles est vide.</string>
+    <string name="lyrics_import_error_encoding">Le fichier de paroles n’a pas pu être décodé.</string>
+    <string name="lyrics_import_error_content">Le fichier ne contient pas de paroles valides.</string>
+    <string name="favorite_change_unavailable">Impossible de modifier les favoris pour cet élément.</string>
+    <string name="spotify_sign_in_again">Spotify demande de vous reconnecter.</string>
+    <string name="spotify_login_rejected">Spotify n’a pas accepté ce compte ou ce code. Vérifiez vos informations et réessayez.</string>
+    <string name="spotify_login_account_unknown">Spotify n’a pas reconnu ce compte.</string>
+    <string name="spotify_error_rate_limit">Spotify limite les requêtes. Réessayez dans une minute.</string>
+    <string name="spotify_login_response_invalid">Réponse de connexion Spotify inattendue.</string>
+    <string name="spotify_error_response_invalid">La réponse de Spotify n’a pas pu être lue.</string>
+    <string name="spotify_error_connection">La connexion à Spotify a été interrompue. Réessayez.</string>
+    <string name="spotify_login_failed">Impossible d’ouvrir la session Spotify.</string>
+    <string name="spotify_service_unavailable">Spotify est indisponible. Réessayez.</string>
+    <string name="operation_failed">Cette opération n’a pas pu être effectuée. Réessayez.</string>
+    <string name="search_request_interrupted">La recherche a été interrompue.</string>
+    <string name="podcasts_episode_load_failed">Ce podcast n’a pas pu être chargé.</string>
+    <string name="playlist_csv_empty">Le fichier est vide.</string>
+    <string name="playlist_csv_invalid">Ce fichier n’a pas été exporté par Melo.</string>
+    <string name="app_name">Melo · Serveur de musique</string>
+</resources>

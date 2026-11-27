@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_view_label">Playlist view</string>
+    <string name="palette_tonal_spot">Tonal Spot</string>
+    <string name="palette_vibrant">Vibrant</string>
+    <string name="palette_expressive">Expressive</string>
+    <string name="palette_fruit_salad">Fruit Salad</string>
+    <string name="collage_cosmic_swirl">Cosmic Swirl</string>
+    <string name="collage_honeycomb_groove">Honeycomb Groove</string>
+    <string name="collage_vinyl_stack">Vinyl Stack</string>
+    <string name="collage_pixel_mosaic">Pixel Mosaic</string>
+    <string name="collage_stardust_scatter">Stardust Scatter</string>
+    <string name="playback_error_offline">This track is not available offline.</string>
+    <string name="playback_error_connection">The audio connection was interrupted. Check the network, then try again.</string>
+    <string name="playback_error_stream">The audio stream could not be provided. Try again in a moment.</string>
+    <string name="playback_error_authorization">Playback authorization could not be obtained. Try again.</string>
+    <string name="playback_error_spotify_policy">Spotify does not allow this track to play in this session.</string>
+    <string name="playback_error_decode">The received audio stream cannot be decoded. Try again or pick another track.</string>
+    <string name="playback_error_output">Audio output could not start. Check the audio device, then try again.</string>
+    <string name="playback_error_generic">This track cannot be played. Try again or pick another track.</string>
+    <string name="playback_error_youtube_match">This track was not found on YouTube Music.</string>
+    <string name="lyrics_import_error_extension">Only .lrc and .ttml lyrics files are supported.</string>
+    <string name="lyrics_import_error_type">The selected file type is not a supported lyrics file.</string>
+    <string name="lyrics_import_error_size">The lyrics file is too large.</string>
+    <string name="lyrics_import_error_empty">The lyrics file is empty.</string>
+    <string name="lyrics_import_error_encoding">The lyrics file could not be decoded.</string>
+    <string name="lyrics_import_error_content">The file does not contain valid lyrics.</string>
+    <string name="favorite_change_unavailable">This item cannot be changed in your favorites.</string>
+    <string name="spotify_sign_in_again">Spotify requires signing in again.</string>
+    <string name="spotify_login_rejected">Spotify did not accept this account or verification code. Check your details and try again.</string>
+    <string name="spotify_login_account_unknown">Spotify did not recognize this account.</string>
+    <string name="spotify_error_rate_limit">Spotify is limiting requests. Try again in a minute.</string>
+    <string name="spotify_login_response_invalid">Unexpected Spotify login response.</string>
+    <string name="spotify_error_response_invalid">The Spotify response could not be read.</string>
+    <string name="spotify_error_connection">The connection to Spotify was interrupted. Try again.</string>
+    <string name="spotify_login_failed">Could not open the Spotify session.</string>
+    <string name="spotify_service_unavailable">Spotify is unavailable. Try again.</string>
+    <string name="operation_failed">This operation could not be completed. Try again.</string>
+    <string name="search_request_interrupted">The search was interrupted.</string>
+    <string name="podcasts_episode_load_failed">This podcast could not be loaded.</string>
+    <string name="playlist_csv_empty">The file is empty.</string>
+    <string name="playlist_csv_invalid">This file was not exported by Melo.</string>
+</resources>

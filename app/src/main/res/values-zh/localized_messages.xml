@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_view_label">歌单视图</string>
+    <string name="palette_tonal_spot">柔和色调</string>
+    <string name="palette_vibrant">鲜艳</string>
+    <string name="palette_expressive">表现力</string>
+    <string name="palette_fruit_salad">缤纷配色</string>
+    <string name="collage_cosmic_swirl">星云旋涡</string>
+    <string name="collage_honeycomb_groove">蜂巢</string>
+    <string name="collage_vinyl_stack">唱片叠放</string>
+    <string name="collage_pixel_mosaic">像素拼图</string>
+    <string name="collage_stardust_scatter">星尘</string>
+    <string name="playback_error_offline">此曲目无法离线播放。</string>
+    <string name="playback_error_connection">音频连接已中断，请检查网络后重试。</string>
+    <string name="playback_error_stream">暂时无法提供音频，请稍后重试。</string>
+    <string name="playback_error_authorization">无法获得播放授权，请重试。</string>
+    <string name="playback_error_spotify_policy">Spotify 不允许在当前会话中播放此曲目。</string>
+    <string name="playback_error_decode">无法解码收到的音频，请重试或换一首。</string>
+    <string name="playback_error_output">无法启动音频输出，请检查音频设备后重试。</string>
+    <string name="playback_error_generic">无法播放此曲目，请重试或换一首。</string>
+    <string name="playback_error_youtube_match">在 YouTube Music 中未找到此曲目。</string>
+    <string name="lyrics_import_error_extension">仅支持 .lrc 和 .ttml 歌词文件。</string>
+    <string name="lyrics_import_error_type">不支持所选歌词文件的格式。</string>
+    <string name="lyrics_import_error_size">歌词文件过大。</string>
+    <string name="lyrics_import_error_empty">歌词文件为空。</string>
+    <string name="lyrics_import_error_encoding">无法解码歌词文件。</string>
+    <string name="lyrics_import_error_content">文件中没有有效歌词。</string>
+    <string name="favorite_change_unavailable">无法更改此项目的收藏状态。</string>
+    <string name="spotify_sign_in_again">Spotify 要求重新登录。</string>
+    <string name="spotify_login_rejected">Spotify 未接受此账号或验证码，请检查后重试。</string>
+    <string name="spotify_login_account_unknown">Spotify 未识别此账号。</string>
+    <string name="spotify_error_rate_limit">Spotify 限制了请求频率，请一分钟后重试。</string>
+    <string name="spotify_login_response_invalid">Spotify 返回了无法识别的登录响应。</string>
+    <string name="spotify_error_response_invalid">无法读取 Spotify 的响应。</string>
+    <string name="spotify_error_connection">与 Spotify 的连接已中断，请重试。</string>
+    <string name="spotify_login_failed">无法建立 Spotify 会话。</string>
+    <string name="spotify_service_unavailable">Spotify 暂不可用，请重试。</string>
+    <string name="operation_failed">无法完成此操作，请重试。</string>
+    <string name="search_request_interrupted">搜索已中断。</string>
+    <string name="podcasts_episode_load_failed">无法加载此播客。</string>
+    <string name="playlist_csv_empty">文件为空。</string>
+    <string name="playlist_csv_invalid">此文件不是由 Melo 导出的。</string>
+    <string name="app_name">Melo · 音乐服务器</string>
+</resources>

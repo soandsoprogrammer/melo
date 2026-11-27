@@ -1,5 +1,7 @@
 package `in`.melo.utils
 
+import androidx.annotation.StringRes
+import `in`.melo.R
 import `in`.melo.data.model.Lyrics
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -141,20 +143,21 @@ object LyricsImportSecurity {
         )
     }
 
-    fun messageFor(reason: LyricsImportFailureReason): String {
+    @StringRes
+    fun messageResource(reason: LyricsImportFailureReason): Int {
         return when (reason) {
             LyricsImportFailureReason.UNSUPPORTED_EXTENSION ->
-                "Only .lrc and .ttml lyrics files are supported."
+                R.string.lyrics_import_error_extension
             LyricsImportFailureReason.UNSUPPORTED_MIME_TYPE ->
-                "The selected file type is not a supported lyrics file."
+                R.string.lyrics_import_error_type
             LyricsImportFailureReason.FILE_TOO_LARGE ->
-                "Lyrics file is too large."
+                R.string.lyrics_import_error_size
             LyricsImportFailureReason.EMPTY_CONTENT ->
-                "Lyrics file is empty."
+                R.string.lyrics_import_error_empty
             LyricsImportFailureReason.INVALID_ENCODING ->
-                "Lyrics file could not be decoded safely."
+                R.string.lyrics_import_error_encoding
             LyricsImportFailureReason.INVALID_LYRICS_CONTENT ->
-                "File does not contain valid lyrics."
+                R.string.lyrics_import_error_content
         }
     }
 

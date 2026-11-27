@@ -219,7 +219,7 @@ fun FullPlayerContent(
                     showFetchLyricsDialog = false
                     showLyricsSheet = true
                 }
-                is LyricsImportValidationResult.Invalid -> playerViewModel.sendToast(LyricsImportSecurity.messageFor(validation.reason))
+                is LyricsImportValidationResult.Invalid -> playerViewModel.sendToast(context.getString(LyricsImportSecurity.messageResource(validation.reason)))
             }
         }
     }

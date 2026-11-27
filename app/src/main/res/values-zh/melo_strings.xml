@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="melo_home_eyebrow">打开音乐，暂别喧嚣</string>
+    <string name="melo_home_title">只听你喜欢的音乐。</string>
+    <string name="melo_home_subtitle">少一点喧嚣，多一点音乐。</string>
+    <string name="melo_discover">发现音乐</string>
+    <string name="melo_intro">为听音乐而设计</string>
+    <string name="melo_intro_sources">Spotify、YouTube Music 和本地文件，\n集中在同一个播放器。</string>
+    <string name="melo_edition">MELO · 简洁的音乐播放器</string>
+    <string name="melo_updates_unavailable">此版本未配置 Melo 更新。</string>
+    <string name="melo_previous">上一首</string>
+    <string name="melo_next">下一首</string>
+    <string name="melo_pause">暂停</string>
+    <string name="melo_player_description">Melo 播放器：%1$s</string>
+    <string name="melo_home_compact_title">立即聆听</string>
+    <string name="melo_cover_of">「%1$s」的封面</string>
+    <string name="melo_connecting">正在连接设备…</string>
+    <string name="melo_preparing">正在准备播放…</string>
+    <string name="melo_loading_audio">正在加载音频…</string>
+    <string name="melo_audio_details">音频详情</string>
+    <string name="melo_loading_library">正在加载你的音乐…</string>
+    <string name="melo_library_error_title">无法刷新曲库</string>
+    <string name="melo_retry">重试</string>
+    <string name="melo_empty_home_title">发现下一首喜欢的歌</string>
+    <string name="melo_empty_home_body">播放歌曲或收藏歌单，它们就会显示在这里。</string>
+    <string name="melo_empty_library_title">从这里建立你的曲库</string>
+    <string name="melo_empty_library_body">收藏喜欢的音乐，即可在这里找到它们。</string>
+    <string name="melo_empty_playlists_body">创建歌单，把想保留在一起的歌曲收进去。</string>
+    <string name="melo_create_playlist">创建歌单</string>
+</resources>

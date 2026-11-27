@@ -63,7 +63,7 @@ internal fun SpotifyPlaylistEditor(
     LaunchedEffect(playlist?.id) {
         if (playlist != null) try { published = model.spotifyPlaylists.published(playlist.id); knownVisibility = true }
         catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { error = failure.message }
+        catch (failure: Exception) { error = saveFailure }
     }
     MeloAlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -134,7 +134,7 @@ internal fun SpotifyPlaylistEditor(
                             onDismiss()
                         }
                     } catch (cancelled: CancellationException) { throw cancelled }
-                    catch (failure: Exception) { error = failure.message ?: saveFailure }
+                    catch (failure: Exception) { error = saveFailure }
                     finally { busy = false }
                 }
             }, size = MeloButtonSize.Medium)
@@ -229,7 +229,7 @@ internal fun LocalPlaylistEditor(model: MeloModel, playlist: Music, onDismiss: (
                         }
                         onDismiss()
                     } catch (cancelled: CancellationException) { throw cancelled }
-                    catch (failure: Exception) { error = failure.message ?: saveFailure }
+                    catch (failure: Exception) { error = saveFailure }
                     finally { busy = false }
                 }
             }, size = MeloButtonSize.Medium)
@@ -251,7 +251,7 @@ internal fun YouTubePlaylistEditor(model: MeloModel, playlist: Music, onDismiss:
     LaunchedEffect(playlist.id) {
         try { public = model.youTubePlaylistPublic(playlist); known = true }
         catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { error = failure.message ?: saveFailure }
+        catch (failure: Exception) { error = saveFailure }
     }
     MeloAlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -273,7 +273,7 @@ internal fun YouTubePlaylistEditor(model: MeloModel, playlist: Music, onDismiss:
                 scope.launch {
                     try { model.editYouTubePlaylist(playlist, name, public); onDismiss() }
                     catch (cancelled: CancellationException) { throw cancelled }
-                    catch (failure: Exception) { error = failure.message ?: saveFailure }
+                    catch (failure: Exception) { error = saveFailure }
                     finally { busy = false }
                 }
             }, size = MeloButtonSize.Medium)

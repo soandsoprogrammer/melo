@@ -80,7 +80,7 @@ private fun formatTimerLeft(ms: Long): String {
 }
 
 class PlayerViewModel(val model: MeloModel, private val scope: CoroutineScope) {
-    private val context: Context get() = model.getApplication()
+    private val context: Context get() = AppLocales.wrap(model.getApplication())
     private val colorProcessor by lazy { ColorSchemeProcessor(context) }
     private val uiPrefs = context.getSharedPreferences("ui_settings", Context.MODE_PRIVATE)
     /** Track order chosen for one playlist, kept on this device. */

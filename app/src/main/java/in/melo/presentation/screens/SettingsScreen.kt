@@ -304,7 +304,7 @@ private fun AppearanceSettings(model: MeloModel, navController: NavHostControlle
             ThemeSelectorItem(
                 label = stringResource(R.string.settings_album_art_palette_title),
                 description = stringResource(R.string.settings_album_art_palette_subtitle),
-                options = AlbumArtPaletteStyle.entries.associate { it.storageKey to it.label },
+                options = AlbumArtPaletteStyle.entries.associate { it.storageKey to stringResource(it.labelRes) },
                 selectedKey = s.palette,
                 onSelectionChanged = { key -> update { it.copy(palette = key) } },
                 leadingIcon = { Icon(MeloIcons.Artwork, null, tint = MaterialTheme.colorScheme.secondary) },
@@ -475,7 +475,7 @@ private fun BehaviorSettings(model: MeloModel, navController: NavHostController)
                 description = stringResource(R.string.settings_app_language_subtitle),
                 options = mapOf(
                     AppSettings.LANGUAGE_SYSTEM to stringResource(R.string.settings_language_system),
-                    "fr" to "Français", "en" to "English",
+                    "zh-CN" to "简体中文", "fr" to "Français", "en" to "English",
                 ),
                 selectedKey = s.language,
                 onSelectionChanged = { key -> update { it.copy(language = key) }; AppLocales.apply(context, key) },
@@ -851,7 +851,7 @@ private fun HomeSettings(model: MeloModel, navController: NavHostController) {
             ThemeSelectorItem(
                 label = stringResource(R.string.settings_collage_pattern_title),
                 description = stringResource(R.string.settings_collage_pattern_subtitle),
-                options = CollagePattern.entries.associate { it.storageKey to it.label },
+                options = CollagePattern.entries.associate { it.storageKey to stringResource(it.labelRes) },
                 selectedKey = s.collagePattern,
                 onSelectionChanged = { key -> model.ui.updateSettings { it.copy(collagePattern = key) } },
                 leadingIcon = { Icon(meloPainter(R.drawable.rounded_view_column_24), null, tint = MaterialTheme.colorScheme.secondary) },

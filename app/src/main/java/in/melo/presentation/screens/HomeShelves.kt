@@ -1,5 +1,6 @@
 package `in`.melo.presentation.screens
 
+import androidx.compose.ui.res.stringResource
 import `in`.melo.presentation.icons.MeloIcons
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -62,7 +63,7 @@ private fun CardTexts(item: Music, centered: Boolean, modifier: Modifier) {
             maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = if (centered) TextAlign.Center else TextAlign.Start,
         )
         Text(
-            item.subtitle.ifBlank { item.kind.label }, Modifier.fillMaxWidth().padding(top = MeloLayout.Space1),
+            item.subtitle.ifBlank { stringResource(item.kind.labelRes) }, Modifier.fillMaxWidth().padding(top = MeloLayout.Space1),
             fontFamily = GoogleSansRounded, fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall,
             maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = if (centered) TextAlign.Center else TextAlign.Start,
@@ -78,7 +79,7 @@ internal fun ShelfCoverCard(item: Music, ui: PlayerViewModel, modifier: Modifier
     val shape = if (round) MeloLayout.ArtistShape else MeloLayout.ArtworkShape
     `in`.melo.presentation.components.MeloShelfCard(
         title = item.title,
-        subtitle = item.subtitle.ifBlank { item.kind.label },
+        subtitle = item.subtitle.ifBlank { stringResource(item.kind.labelRes) },
         onClick = onClick,
         onLongClick = onLongClick,
         modifier = modifier,

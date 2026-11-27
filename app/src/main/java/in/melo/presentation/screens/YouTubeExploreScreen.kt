@@ -399,7 +399,7 @@ private fun ExploreCategoryPage(
 private fun ExplorePlaylistTile(item: Music, onClick: () -> Unit, onLongClick: () -> Unit) {
     `in`.melo.presentation.components.MeloShelfCard(
         title = item.title,
-        subtitle = item.subtitle.ifBlank { item.kind.label },
+        subtitle = item.subtitle.ifBlank { stringResource(item.kind.labelRes) },
         onClick = onClick,
         onLongClick = onLongClick,
         modifier = Modifier.width(MeloLayout.ShelfCardWidth).padding(bottom = 4.dp),

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_settings_title">检查更新</string>
+    <string name="update_checking">正在检查更新…</string>
+    <string name="update_available">有可用更新</string>
+    <string name="update_installed">已安装版本：%1$s</string>
+    <string name="update_action">更新</string>
+    <string name="update_later">稍后</string>
+    <string name="update_close">关闭</string>
+    <string name="update_cancel">取消</string>
+    <string name="update_retry">重试</string>
+    <string name="update_release_page">发布页面</string>
+    <string name="update_no_apk">打开发布页面下载此版本。</string>
+    <string name="update_downloading">正在下载更新</string>
+    <string name="update_downloaded">已下载 %1$s MB</string>
+    <string name="update_ready">可以安装</string>
+    <string name="update_install">安装</string>
+    <string name="update_install_description">Android 会请你确认更新。如果出现提示，请允许 Melo 安装应用，然后返回继续。</string>
+    <string name="update_failed_title">无法更新</string>
+    <string name="update_check_failed">无法检查更新。请重试，或打开发布页面。</string>
+    <string name="update_download_failed">更新下载或验证失败。请重试，或打开发布页面。</string>
+    <string name="update_current_title">已是最新版本</string>
+    <string name="update_current_description">当前为 Melo %1$s，暂无更新版本。</string>
+    <string name="update_now">立即更新</string>
+    <string name="update_not_today">暂不更新</string>
+    <string name="update_eyebrow_new">新版本</string>
+    <string name="update_eyebrow_updated">刚刚更新</string>
+    <string name="update_you_have">当前为 %1$s</string>
+    <string name="update_you_have_size">当前为 %1$s · %2$s MB</string>
+    <string name="update_progress_of">已下载 %1$s / %2$s MB</string>
+    <string name="update_notes_subtitle">查看此版本的更新内容。</string>
+    <string name="update_continue">继续</string>
+    <string name="community_invite_eyebrow">社区</string>
+    <string name="community_invite_title">加入 Melo 社区</string>
+    <string name="community_invite_message">感谢更新 Melo。欢迎加入 Discord，分享反馈、寻求帮助和获取最新消息。</string>
+    <string name="community_invite_join">加入 Discord</string>
+    <string name="community_invite_later">以后再说</string>
+</resources>

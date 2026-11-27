@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="music_server_title">音乐服务器</string>
     <string name="music_server_back">返回</string>
@@ -14,7 +14,7 @@
     <string name="music_server_albums">专辑</string>
     <string name="music_server_songs">歌曲</string>
     <string name="music_server_retry">重试</string>
-    <string name="music_server_empty">没有找到音乐。</string>
+    <string name="music_server_empty">未找到音乐。</string>
     <string name="music_server_more">加载更多</string>
     <string name="music_server_error_address">请输入有效的 HTTPS 服务器地址。</string>
     <string name="music_server_error_credentials">请检查服务器用户名和密码。</string>

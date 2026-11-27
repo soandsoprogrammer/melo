@@ -1,5 +1,8 @@
 package `in`.melo
 
+import `in`.melo.utils.AppLocales
+import `in`.melo.data.Login5Error
+import `in`.melo.R
 import android.app.Application
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
@@ -221,6 +224,7 @@ private data class HomeRecommendationRequest(
 )
 
 class MeloModel(private val app: Application) : AndroidViewModel(app) {
+    private val uiContext get() = AppLocales.wrap(app)
     val player = SpotifyPlayer(app, viewModelScope)
     private val pinnedStore = PinnedStore(app)
     val pins = pinnedStore.pins
@@ -429,7 +433,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun youTubeAccountLost(failure: YouTubeAuthRequired) {
         disconnectGoogle()
-        mutableMessage.value = app.getString(`in`.melo.R.string.google_session_closed)
+        mutableMessage.value = uiContext.getString(`in`.melo.R.string.google_session_closed)
         `in`.melo.data.diagnostics.DiagnosticLog.record("youtube-account", "signed out: ${failure.message}")
     }
 
@@ -514,7 +518,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
             if (known == null) known = withContext(Dispatchers.IO) { store.loadDetail(item.id) }
             mutableDetails.update { it + (item.id to DetailUi(known, loading = online.value)) }
             if (!online.value) {
-                if (known == null) mutableDetails.update { it + (item.id to DetailUi(error = app.getString(`in`.melo.R.string.youtube_playlist_failed))) }
+                if (known == null) mutableDetails.update { it + (item.id to DetailUi(error = uiContext.getString(`in`.melo.R.string.youtube_playlist_failed))) }
                 return@launch
             }
             try { fetchYouTubePlaylist(item) }
@@ -523,7 +527,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
             catch (failure: Exception) {
                 `in`.melo.data.diagnostics.DiagnosticLog.record("youtube-playlist", "${failure.javaClass.simpleName} \"${failure.message}\"")
                 mutableDetails.update { it + (item.id to if (known != null) DetailUi(known)
-                    else DetailUi(error = app.getString(`in`.melo.R.string.youtube_playlist_failed))) }
+                    else DetailUi(error = uiContext.getString(`in`.melo.R.string.youtube_playlist_failed))) }
             }
         }
     }
@@ -590,7 +594,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
     internal suspend fun addYouTubePlaylistTracks(playlist: Music, tracks: List<Music>) {
         val kept = tracks.filter { it.youTubeVideoId != null }
-        if (kept.isEmpty()) throw IllegalArgumentException(app.getString(`in`.melo.R.string.youtube_playlist_only_youtube))
+        if (kept.isEmpty()) throw IllegalArgumentException(uiContext.getString(`in`.melo.R.string.youtube_playlist_only_youtube))
         val refused = try { withContext(Dispatchers.IO) { YouTubeLibrary.add(playlist.id, kept.mapNotNull { it.youTubeVideoId }) } }
         catch (auth: YouTubeAuthRequired) { youTubeAccountLost(auth); throw auth }
         reportRefused(refused.size)
@@ -604,7 +608,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun reportRefused(count: Int) {
-        if (count > 0) mutableMessage.value = app.resources.getQuantityString(`in`.melo.R.plurals.youtube_tracks_refused, count, count)
+        if (count > 0) mutableMessage.value = uiContext.resources.getQuantityString(`in`.melo.R.plurals.youtube_tracks_refused, count, count)
     }
 
     /** Removes the row at [index] of the playlist as shown; other copies of the same track stay. */
@@ -617,8 +621,8 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         try {
             var rows = youTubeRows[playlist.id]?.takeIf { it.tracks.map(Music::id) == content.tracks.map(Music::id) }
             if (rows == null) rows = withContext(Dispatchers.IO) { YouTubeLibrary.playlist(playlist.id) }
-            val row = rowOf(rows) ?: throw YouTubeFailure(app.getString(`in`.melo.R.string.youtube_playlist_row_gone))
-            val setVideoId = rows.setVideoIds[row] ?: throw YouTubeFailure(app.getString(`in`.melo.R.string.youtube_playlist_row_gone))
+            val row = rowOf(rows) ?: throw YouTubeFailure(uiContext.getString(`in`.melo.R.string.youtube_playlist_row_gone))
+            val setVideoId = rows.setVideoIds[row] ?: throw YouTubeFailure(uiContext.getString(`in`.melo.R.string.youtube_playlist_row_gone))
             withContext(Dispatchers.IO) { YouTubeLibrary.remove(playlist.id, videoId, setVideoId) }
             detailJobs.remove(playlist.id)?.cancel()
             val remaining = rows.copy(tracks = rows.tracks.filterIndexed { i, _ -> i != row },
@@ -667,7 +671,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         val current = mutablePodcastFeed.value
         if (!force && current.feed != null && System.currentTimeMillis() - podcastFeedLoadedAt < PODCAST_FEED_TTL_MS) return
         if (!online.value) {
-            if (current.feed == null) mutablePodcastFeed.update { it.copy(error = app.getString(`in`.melo.R.string.podcasts_offline_message)) }
+            if (current.feed == null) mutablePodcastFeed.update { it.copy(error = uiContext.getString(`in`.melo.R.string.podcasts_offline_message)) }
             return
         }
 
@@ -688,7 +692,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                 throw cancelled
             } catch (failure: Exception) {
                 if (requestIdentity == podcastFeedIdentity && requestRegion == podcastFeedRegion) {
-                    mutablePodcastFeed.update { it.copy(error = failure.message ?: app.getString(`in`.melo.R.string.podcasts_load_error_message)) }
+                    mutablePodcastFeed.update { it.copy(error = uiContext.getString(R.string.podcasts_load_error_message)) }
                 }
             } finally {
                 if (requestIdentity == podcastFeedIdentity && requestRegion == podcastFeedRegion &&
@@ -725,7 +729,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                 throw cancelled
             } catch (failure: Exception) {
                 if (identity == podcastFeedIdentity && region == podcastFeedRegion) {
-                    mutablePodcastFeed.update { it.copy(error = failure.message ?: app.getString(`in`.melo.R.string.podcasts_load_error_message)) }
+                    mutablePodcastFeed.update { it.copy(error = uiContext.getString(R.string.podcasts_load_error_message)) }
                 }
             } finally {
                 if (identity == podcastFeedIdentity && region == podcastFeedRegion &&
@@ -836,7 +840,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         if (item.kind == MusicKind.Track && item.isYouTubeTrack) { toggleYouTubeLike(item); return }
         if (item.isLocalTrack || item.isLocalPlaylist || item.source != `in`.melo.data.MusicSource.Spotify || item.id.startsWith("ytm:")) return
         if (item.kind != MusicKind.Track && item.kind != MusicKind.Album && item.kind != MusicKind.Artist) {
-            mutableMessage.value = "This item cannot be changed in your favorites."
+            mutableMessage.value = uiContext.getString(R.string.favorite_change_unavailable)
             return
         }
         val source = collections ?: return
@@ -1205,7 +1209,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                 if (!refresh || !online.value) return@launch
             }
             if (!online.value) {
-                if (stored == null) mutableDetails.update { it + (item.id to DetailUi(error = app.getString(`in`.melo.R.string.spotify_link_unavailable))) }
+                if (stored == null) mutableDetails.update { it + (item.id to DetailUi(error = uiContext.getString(`in`.melo.R.string.spotify_link_unavailable))) }
                 return@launch
             }
             try {
@@ -1218,7 +1222,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                     subtitle = if (item.kind == MusicKind.Playlist) `in`.melo.utils.formatSongCount(public.tracks.size) else item.subtitle,
                 )
                 if (public.tracks.isEmpty() && item.kind != MusicKind.Artist) {
-                    throw java.io.IOException(app.getString(`in`.melo.R.string.spotify_link_unavailable))
+                    throw java.io.IOException(uiContext.getString(`in`.melo.R.string.spotify_link_unavailable))
                 }
                 val detail = CatalogDetail(resolved, public.tracks, total = public.tracks.size)
                 ui.register(resolved)
@@ -1950,7 +1954,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
     fun playHomeRecommendation(pick: HomeRecommendationPick): Job? {
         if (!online.value) {
-            mutableMessage.value = app.getString(`in`.melo.R.string.home_mood_offline)
+            mutableMessage.value = uiContext.getString(`in`.melo.R.string.home_mood_offline)
             return null
         }
         return viewModelScope.launch {
@@ -2084,7 +2088,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         val playback = player.state.value
         val seed = playback.track ?: return
         if (seed.isLocalTrack || !online.value) {
-            if (!online.value) mutableMessage.value = app.getString(`in`.melo.R.string.queue_recommendations_offline)
+            if (!online.value) mutableMessage.value = uiContext.getString(`in`.melo.R.string.queue_recommendations_offline)
             return
         }
 
@@ -2109,13 +2113,13 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
                 if (player.state.value.track?.id != seed.id) return@launch
                 if (recommendations.isEmpty()) {
-                    mutableMessage.value = app.getString(`in`.melo.R.string.queue_recommendations_no_new)
+                    mutableMessage.value = uiContext.getString(`in`.melo.R.string.queue_recommendations_no_new)
                     return@launch
                 }
                 if (!player.replaceRadioRecommendations(seed.id, recommendations) &&
                     player.state.value.track?.id == seed.id
                 ) {
-                    mutableMessage.value = app.getString(`in`.melo.R.string.queue_recommendations_no_new)
+                    mutableMessage.value = uiContext.getString(`in`.melo.R.string.queue_recommendations_no_new)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
@@ -2319,7 +2323,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         val tracks = withLocalFiles(queue)
         val selected = tracks.getOrNull(index)
         if (selected != null && selected.isLocalTrack && selected.mediaUri == null) {
-            mutableMessage.value = app.getString(`in`.melo.R.string.local_file_missing, selected.title); return
+            mutableMessage.value = uiContext.getString(`in`.melo.R.string.local_file_missing, selected.title); return
         }
         player.play(tracks, index)
     }
@@ -2375,7 +2379,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
             results.forEach(ui::register)
             mutableDiscovery.update {
                 it.copy(loading = false, results = results,
-                    error = if (results.isEmpty()) app.getString(`in`.melo.R.string.addon_search_empty) else null)
+                    error = if (results.isEmpty()) uiContext.getString(`in`.melo.R.string.addon_search_empty) else null)
             }
         }
     }
@@ -2459,10 +2463,10 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun readableSearchFailure(failure: Throwable): String = when (failure) {
-        is `in`.melo.data.youtube.YouTubeFailure -> app.getString(`in`.melo.R.string.youtube_search_failed)
-        is SpotifyFailure -> failure.message.orEmpty()
-        is InvalidProtocolBufferException -> "Unexpected Spotify response format."
-        else -> "The search was interrupted."
+        is `in`.melo.data.youtube.YouTubeFailure -> uiContext.getString(`in`.melo.R.string.youtube_search_failed)
+        is SpotifyFailure -> spotifyFailureLabel(failure, R.string.search_request_interrupted)
+        is InvalidProtocolBufferException -> uiContext.getString(R.string.spotify_error_response_invalid)
+        else -> uiContext.getString(R.string.search_request_interrupted)
     }
 
     /** Next pages are added after what is shown, without moving it. */
@@ -2668,17 +2672,17 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
     /** Only a refusal of the saved account leads back to the sign-in screen. */
     private fun accountLost(failure: SpotifyAuthRequired) {
         disconnectSpotify()
-        mutableAccount.value = AccountUi(error = failure.message)
+        mutableAccount.value = AccountUi(error = spotifyFailureLabel(failure, R.string.spotify_sign_in_again))
     }
 
     private fun showAccountError(failure: Exception) {
         if (failure is SpotifyAuthRequired) vault.clear()
         mutableAccount.value = AccountUi(
             error = when (failure) {
-                is SpotifyFailure -> failure.message
-                is InvalidProtocolBufferException -> "Unexpected Android login response."
-                is IOException -> "The connection to Spotify was interrupted."
-                else -> "Could not open the Spotify session on this device."
+                is SpotifyFailure -> spotifyFailureLabel(failure, R.string.spotify_login_failed)
+                is InvalidProtocolBufferException -> uiContext.getString(R.string.spotify_login_response_invalid)
+                is IOException -> uiContext.getString(R.string.spotify_error_connection)
+                else -> uiContext.getString(R.string.spotify_login_failed)
             },
         )
     }
@@ -2724,11 +2728,20 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
         player.close()
     }
     private fun readable(failure: Exception): String = when (failure) {
-        is SpotifyFailure -> failure.message ?: "Spotify is unavailable. Try again."
-        is InvalidProtocolBufferException -> "The Spotify response could not be read."
-        is IOException -> "The connection to Spotify was interrupted. Try again."
-        else -> "This operation could not be completed. Try again."
+        is SpotifyFailure -> spotifyFailureLabel(failure, R.string.spotify_service_unavailable)
+        is InvalidProtocolBufferException -> uiContext.getString(R.string.spotify_error_response_invalid)
+        is IOException -> uiContext.getString(R.string.operation_failed)
+        else -> uiContext.getString(R.string.operation_failed)
     }
+    private fun spotifyFailureLabel(failure: SpotifyFailure, fallback: Int): String =
+        uiContext.getString(when {
+            failure is Login5Error && failure.error == 5 -> R.string.spotify_login_account_unknown
+            failure is Login5Error && failure.status == 401 -> R.string.spotify_login_rejected
+            failure is SpotifyAuthRequired -> R.string.spotify_sign_in_again
+            failure.status == 429 -> R.string.spotify_error_rate_limit
+            else -> fallback
+        })
+
     /** Tracks to add to a playlist, from one source; nothing is kept in the search history. */
     suspend fun searchTracks(query: String, source: String): List<Music> {
         val text = query.trim()
@@ -2788,10 +2801,10 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                 pinnedStore.pins.value.firstOrNull { it.id == item.id }?.let(pinnedStore::toggle)
                 `in`.melo.playback.DownloadCenter.remove(app, item.id)
                 mutableDetails.update { it - item.id }
-                mutableMessage.value = app.getString(`in`.melo.R.string.playlist_deleted, item.title)
+                mutableMessage.value = uiContext.getString(`in`.melo.R.string.playlist_deleted, item.title)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (auth: SpotifyAuthRequired) { accountLost(auth) }
-            catch (failure: Exception) { mutableMessage.value = (failure as? SpotifyFailure)?.message ?: readable(failure) }
+            catch (failure: Exception) { mutableMessage.value = readable(failure) }
         }
     }
 
@@ -2878,10 +2891,10 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
                 `in`.melo.playback.DownloadCenter.remove(app, item.id)
                 mutableDetails.update { it - item.id }
                 withContext(Dispatchers.IO) { store.removeDetail(item.id) }
-                mutableMessage.value = app.getString(`in`.melo.R.string.playlist_deleted, item.title)
+                mutableMessage.value = uiContext.getString(`in`.melo.R.string.playlist_deleted, item.title)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (auth: YouTubeAuthRequired) { youTubeAccountLost(auth) }
-            catch (failure: Exception) { mutableMessage.value = failure.message ?: app.getString(`in`.melo.R.string.youtube_playlist_failed) }
+            catch (failure: Exception) { mutableMessage.value = uiContext.getString(R.string.youtube_playlist_failed) }
         }
     }
 
@@ -2893,7 +2906,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
 
     suspend fun importCsv(text: String, fileName: String): Music {
         val imported = withContext(Dispatchers.Default) { `in`.melo.data.PlaylistCsv.import(text, fileName.substringBeforeLast('.')) }
-        if (imported.tracks.isEmpty()) throw IllegalArgumentException(app.getString(`in`.melo.R.string.import_no_tracks))
+        if (imported.tracks.isEmpty()) throw IllegalArgumentException(uiContext.getString(`in`.melo.R.string.import_no_tracks))
         return createImported(imported.name, completeSpotifyTracks(imported.tracks))
     }
 
@@ -2904,7 +2917,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
             return createImported(playlist.title, playlist.tracks)
         }
         val spotifyId = `in`.melo.data.spotifyPlaylistId(link)
-            ?: throw IllegalArgumentException(app.getString(`in`.melo.R.string.import_unknown_link))
+            ?: throw IllegalArgumentException(uiContext.getString(`in`.melo.R.string.import_unknown_link))
         val source = catalog
         if (source != null) {
             val item = Music("spotify:playlist:$spotifyId", "", "", MusicKind.Playlist)
@@ -2912,7 +2925,7 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
             return createImported(detail.item.title.ifBlank { "Spotify" }, detail.tracks)
         }
         val content = withContext(Dispatchers.IO) { `in`.melo.data.SpotifyPublicPlaylist.read(spotifyId) }
-        if (content.tracks.isEmpty()) throw IllegalArgumentException(app.getString(`in`.melo.R.string.import_no_tracks))
+        if (content.tracks.isEmpty()) throw IllegalArgumentException(uiContext.getString(`in`.melo.R.string.import_no_tracks))
         return createImported(content.name.ifBlank { "Spotify" }, content.tracks)
     }
 
@@ -2944,10 +2957,10 @@ class MeloModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun createImported(name: String, tracks: List<Music>): Music {
-        val playlist = localPlaylistStore.create(name.ifBlank { app.getString(`in`.melo.R.string.import_default_name) }, withLocalFiles(tracks))
+        val playlist = localPlaylistStore.create(name.ifBlank { uiContext.getString(`in`.melo.R.string.import_default_name) }, withLocalFiles(tracks))
         val music = playlist.asMusic()
         ui.register(music)
-        mutableMessage.value = app.getString(`in`.melo.R.string.import_done, music.title, playlist.tracks.size)
+        mutableMessage.value = uiContext.getString(`in`.melo.R.string.import_done, music.title, playlist.tracks.size)
         return music
     }
 

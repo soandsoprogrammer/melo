@@ -46,7 +46,11 @@ fun ImportPlaylistDialog(model: MeloModel, onDismiss: () -> Unit, onImported: (M
         scope.launch {
             try { onImported(action()) }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (failure: Exception) { error = (failure as? IllegalArgumentException)?.message ?: failed }
+            catch (failure: Exception) { error = when (failure.message) {
+                    "The file is empty." -> context.getString(R.string.playlist_csv_empty)
+                    "This file was not exported by Melo." -> context.getString(R.string.playlist_csv_invalid)
+                    else -> failed
+                } }
             finally { busy = false }
         }
     }

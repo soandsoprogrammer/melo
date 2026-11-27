@@ -1,5 +1,8 @@
 package `in`.melo.playback
 
+import androidx.annotation.StringRes
+import `in`.melo.R
+import `in`.melo.utils.AppLocales
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
@@ -14,7 +17,7 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import `in`.melo.data.Music
 import `in`.melo.data.MusicKind
-import `in`.melo.data.SpotifyFailure
+import `in`.melo.data.youtube.YouTubeFailure
 import `in`.melo.data.isLocalTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -429,10 +432,14 @@ class SpotifyPlayer(context: Context, scope: CoroutineScope) : AutoCloseable {
             .coerceAtLeast(0) + after.size
         val contextTailId = after.lastOrNull()?.id ?: queue.lastOrNull()?.id
         val error = player.playerError?.let { failure ->
-            generateSequence<Throwable>(failure) { it.cause }.take(12)
-                .firstOrNull { it is SpotifyFailure || it is `in`.melo.data.youtube.YouTubeFailure }?.message
-                ?: if (!`in`.melo.data.NetworkMonitor.online.value) "This track is not available offline."
-                else playbackErrorMessage(failure.errorCode)
+            val notFound = generateSequence<Throwable>(failure) { it.cause }.take(12)
+                .filterIsInstance<YouTubeFailure>().any { it.status == "NO_MATCH" }
+            val message = when {
+                !`in`.melo.data.NetworkMonitor.online.value -> R.string.playback_error_offline
+                notFound -> R.string.playback_error_youtube_match
+                else -> playbackErrorResource(failure.errorCode)
+            }
+            AppLocales.wrap(appContext).getString(message)
         }
         mutableState.value = Playback(queue, index, player.isPlaying, player.playbackState == Player.STATE_BUFFERING,
             player.currentPosition.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(), duration.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
@@ -507,20 +514,21 @@ internal fun togglePlayback(player: Player) {
         player.play()
     }
 }
-internal fun playbackErrorMessage(code: Int): String = when (code) {
+@StringRes
+internal fun playbackErrorResource(code: Int): Int = when (code) {
     PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
     PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
-    PlaybackException.ERROR_CODE_TIMEOUT -> "The audio connection was interrupted. Check the network, then try again."
-    PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> "The audio stream could not be provided. Try again in a moment."
+    PlaybackException.ERROR_CODE_TIMEOUT -> R.string.playback_error_connection
+    PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> R.string.playback_error_stream
     PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED,
-    PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED -> "Playback authorization could not be obtained. Try again."
-    PlaybackException.ERROR_CODE_DRM_DISALLOWED_OPERATION -> "Spotify does not allow this track to play in this session."
+    PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED -> R.string.playback_error_authorization
+    PlaybackException.ERROR_CODE_DRM_DISALLOWED_OPERATION -> R.string.playback_error_spotify_policy
     PlaybackException.ERROR_CODE_DRM_SYSTEM_ERROR,
     PlaybackException.ERROR_CODE_DRM_CONTENT_ERROR,
-    PlaybackException.ERROR_CODE_DECODING_FAILED -> "The received audio stream cannot be decoded. Try again or pick another track."
+    PlaybackException.ERROR_CODE_DECODING_FAILED -> R.string.playback_error_decode
     PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED,
-    PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> "Audio output could not start. Check the audio device, then try again."
-    else -> "This track cannot be played. Try again or pick another track."
+    PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> R.string.playback_error_output
+    else -> R.string.playback_error_generic
 }
 private fun Music.isPlayableTrack(): Boolean = kind == MusicKind.Track &&
     (id.startsWith("spotify:track:") || id.startsWith(`in`.melo.data.youtube.YTM_TRACK_PREFIX) ||

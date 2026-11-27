@@ -1,5 +1,7 @@
 package `in`.melo.presentation.components.player
 
+import androidx.compose.ui.res.stringResource
+import `in`.melo.R
 import `in`.melo.data.preferences.AppSettings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -349,7 +351,7 @@ internal fun EfficientSlider(
         inactiveTrackColor = inactiveTrackColor,
         isVisible = isVisible,
         trackEdgePadding = trackEdgePadding,
-        semanticsLabel = "Playback position",
+        semanticsLabel = stringResource(R.string.lyrics_playback_position),
         style = style,
         isPlaying = isPlaying,
         accents = accents,

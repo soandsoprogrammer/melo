@@ -133,7 +133,7 @@ internal fun MiniPlayerContentInternal(
             key(song.id) {
                 SmartImage(
                     model = albumArtModel,
-                    contentDescription = "Cover of ${song.title}",
+                    contentDescription = stringResource(R.string.melo_cover_of, song.title),
                     shape = MiniArtShape,
                     targetSize = Size(150, 150),
                     modifier = Modifier

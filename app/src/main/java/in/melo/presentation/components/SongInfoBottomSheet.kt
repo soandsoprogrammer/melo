@@ -336,7 +336,7 @@ fun EntityOptionsSheet(
             OptionsSheetHeader(
                 artwork = item.imageUrl,
                 title = item.title,
-                subtitle = item.subtitle.ifBlank { item.kind.label },
+                subtitle = item.subtitle.ifBlank { stringResource(item.kind.labelRes) },
                 artShape = if (item.kind == MusicKind.Artist) CircleShape else MeloLayout.ArtworkShape,
             )
             Row1Actions(

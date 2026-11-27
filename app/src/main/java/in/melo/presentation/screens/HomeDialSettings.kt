@@ -201,7 +201,7 @@ internal fun HomeDialSettingsSheet(
                                     Column(Modifier.weight(1f)) {
                                         Text(item.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(
-                                            item.subtitle.ifBlank { item.kind.label },
+                                            item.subtitle.ifBlank { stringResource(item.kind.labelRes) },
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                             style = MaterialTheme.typography.bodySmall,

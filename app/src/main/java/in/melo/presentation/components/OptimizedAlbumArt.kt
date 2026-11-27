@@ -1,5 +1,6 @@
 package `in`.melo.presentation.components
 
+import androidx.compose.ui.res.stringResource
 import `in`.melo.presentation.icons.meloPainter
 import android.graphics.Bitmap
 import android.net.Uri
@@ -117,7 +118,7 @@ fun OptimizedAlbumArt(
     // This avoids recompositions on painter.state changes during scroll.
     SubcomposeAsyncImage(
         model = requestModel,
-        contentDescription = "Album art of $title",
+        contentDescription = stringResource(R.string.common_album_art_for_title, title),
         modifier = modifier,
         contentScale = ContentScale.Crop,
         onSuccess = { state ->
@@ -185,7 +186,7 @@ private fun renderDirectAlbumArt(
         is ImageVector -> {
             Image(
                 imageVector = model,
-                contentDescription = "Album art of $title",
+                contentDescription = stringResource(R.string.common_album_art_for_title, title),
                 contentScale = ContentScale.Crop,
                 modifier = modifier.fillMaxSize()
             )
@@ -194,7 +195,7 @@ private fun renderDirectAlbumArt(
         is Painter -> {
             Image(
                 painter = model,
-                contentDescription = "Album art of $title",
+                contentDescription = stringResource(R.string.common_album_art_for_title, title),
                 contentScale = ContentScale.Crop,
                 modifier = modifier.fillMaxSize()
             )
@@ -203,7 +204,7 @@ private fun renderDirectAlbumArt(
         is ImageBitmap -> {
             Image(
                 bitmap = model,
-                contentDescription = "Album art of $title",
+                contentDescription = stringResource(R.string.common_album_art_for_title, title),
                 contentScale = ContentScale.Crop,
                 modifier = modifier.fillMaxSize()
             )
@@ -212,7 +213,7 @@ private fun renderDirectAlbumArt(
         is Bitmap -> {
             Image(
                 bitmap = model.asImageBitmap(),
-                contentDescription = "Album art of $title",
+                contentDescription = stringResource(R.string.common_album_art_for_title, title),
                 contentScale = ContentScale.Crop,
                 modifier = modifier.fillMaxSize()
             )
@@ -325,7 +326,7 @@ internal fun albumArtMemoryCacheKey(model: Any?, targetSize: Size): String? {
 //            is AsyncImagePainter.State.Success -> {
 //                Image(
 //                    painter = currentState.painter,
-//                    contentDescription = "Album art of $title",
+//                    contentDescription = stringResource(R.string.common_album_art_for_title, title),
 //                    contentScale = ContentScale.Crop,
 //                    modifier = Modifier.fillMaxSize()
 //                )

@@ -244,7 +244,7 @@ private fun ConversionContent(model: MeloModel, navController: NavHostController
                             failed = { failure ->
                                 val status = (failure as? `in`.melo.data.youtube.YouTubeFailure)?.status
                                 if (status == "403" || status == "429") youTubeRefused
-                                else failure.message?.takeIf(String::isNotBlank) ?: createFailed
+                                else createFailed
                             },
                         )
                     },
