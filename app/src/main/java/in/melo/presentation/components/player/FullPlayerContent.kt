@@ -80,6 +80,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -208,6 +209,7 @@ fun FullPlayerContent(
     val stableForLyrics by playerViewModel.stablePlayerState.collectAsStateWithLifecycle()
     val currentLyrics = stableForLyrics.lyrics
     val context = LocalContext.current
+    val resources = LocalResources.current
     val lyricsImportScope = rememberCoroutineScope()
     val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
@@ -219,7 +221,7 @@ fun FullPlayerContent(
                     showFetchLyricsDialog = false
                     showLyricsSheet = true
                 }
-                is LyricsImportValidationResult.Invalid -> playerViewModel.sendToast(context.getString(LyricsImportSecurity.messageResource(validation.reason)))
+                is LyricsImportValidationResult.Invalid -> playerViewModel.sendToast(resources.getString(LyricsImportSecurity.messageResource(validation.reason)))
             }
         }
     }

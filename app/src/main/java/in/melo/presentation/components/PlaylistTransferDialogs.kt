@@ -38,6 +38,8 @@ fun ImportPlaylistDialog(model: MeloModel, onDismiss: () -> Unit, onImported: (M
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val failed = stringResource(R.string.import_failed)
+    val emptyCsv = stringResource(R.string.playlist_csv_empty)
+    val invalidCsv = stringResource(R.string.playlist_csv_invalid)
     var link by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -46,11 +48,13 @@ fun ImportPlaylistDialog(model: MeloModel, onDismiss: () -> Unit, onImported: (M
         scope.launch {
             try { onImported(action()) }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (failure: Exception) { error = when (failure.message) {
-                    "The file is empty." -> context.getString(R.string.playlist_csv_empty)
-                    "This file was not exported by Melo." -> context.getString(R.string.playlist_csv_invalid)
+            catch (failure: Exception) {
+                error = when (failure.message) {
+                    "The file is empty." -> emptyCsv
+                    "This file was not exported by Melo." -> invalidCsv
                     else -> failed
-                } }
+                }
+            }
             finally { busy = false }
         }
     }
