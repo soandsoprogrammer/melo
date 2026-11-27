@@ -32,7 +32,7 @@ internal class PageTransitions(
      * Pages that are a WebView. Its surface redraws on every frame of an alpha or
      * offset animation and flickers, so these pages cut in and out instead.
      */
-    private val webPages = setOf(Screen.GoogleSignIn.route, Screen.DiscordLogin.route)
+    private val webPages = setOf(Screen.DiscordLogin.route)
 
     private fun isWebPage(from: String?, to: String?): Boolean = from in webPages || to in webPages
 

@@ -12,7 +12,7 @@ internal object SpotifyAccount {
     val transport = SpotifyTransport()
     private val lock = Mutex()
     @Volatile private var active: SpotifySession? = null
-    /** Without a session, Spotify tracks play through their YouTube Music match. */
+    /** Without a session, Spotify tracks play through their matching server recording. */
     val signedIn: Boolean get() = active != null
     /** The open session, without restoring one. */
     fun current(): SpotifySession? = active

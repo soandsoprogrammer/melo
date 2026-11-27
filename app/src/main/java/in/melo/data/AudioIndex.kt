@@ -9,11 +9,8 @@ import java.security.MessageDigest
 
 /** One encrypted audio file of the CDN, as the media playlist describes it. */
 internal data class AudioFileRecord(val hex: String, val expectedBytes: Long, val playlistUrl: String) {
-    /** YouTube Music files are plain audio: nothing to prepare before playing them. */
-    val isYouTube: Boolean get() = hex.startsWith(YOUTUBE_FILE_PREFIX)
 }
 
-internal const val YOUTUBE_FILE_PREFIX = "yt-"
 
 /** JSON has no NaN: absent values are written as null and read back as NaN. */
 private fun Float.toSafeJson(): Any = if (isNaN()) JSONObject.NULL else toDouble()
@@ -64,7 +61,7 @@ internal class AudioIndex private constructor(context: Context) {
         val current = records[track] ?: AudioRecord(Music(track, "", "", MusicKind.Track))
         if (current.file != file) { records[track] = current.copy(file = file); changed() }
     }
-    /** A file read straight from its address, with no media playlist: a YouTube Music stream. */
+    /** A file read straight from its address, with no media playlist: a server stream. */
     @Synchronized fun attachDirectFile(track: String, file: AudioFileRecord) {
         val current = records[track] ?: AudioRecord(Music(track, "", "", MusicKind.Track))
         if (current.file != file) { records[track] = current.copy(file = file); changed() }

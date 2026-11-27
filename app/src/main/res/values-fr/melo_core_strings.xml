@@ -107,7 +107,7 @@
     <string name="home_account_not_connected">Non connecté</string>
     <string name="home_speed_dial_history_description">Écoutes récentes.</string>
     <string name="home_dial_page">%1$d sur %2$d</string>
-    <string name="home_personalized_feed_title">Votre fil YouTube Music</string>
+    <string name="home_personalized_feed_title">Votre fil serveur de musique</string>
     <string name="home_dial_customize">Personnaliser l’accès rapide</string>
     <string name="home_dial_speed_dial">Afficher l’accès rapide</string>
     <string name="home_dial_artist_dial">Afficher les artistes</string>
@@ -121,7 +121,6 @@
     <string name="home_dial_scroll_to_feed">Voir les recommandations</string>
     <string name="home_dial_source">Source des vignettes</string>
     <string name="home_dial_source_history">Historique</string>
-    <string name="home_dial_source_youtube">YT Music</string>
     <string name="home_dial_source_spotify">Spotify</string>
     <string name="home_dial_rows">Lignes par page</string>
     <string name="home_dial_rows_value">%1$d lignes</string>
@@ -141,7 +140,7 @@
     <string name="explore_subtitle">Ambiances, genres et nouvelles façons d’écouter.</string>
     <string name="explore_unavailable">Explore est indisponible</string>
     <string name="explore_empty_title">Rien à explorer pour le moment</string>
-    <string name="explore_empty_body">YouTube Music ne propose aucune ambiance ou aucun genre actuellement.</string>
+    <string name="explore_empty_body">serveur de musique ne propose aucune ambiance ou aucun genre actuellement.</string>
     <string name="explore_category_empty">Aucune playlist n’est disponible pour cette catégorie.</string>
     <string name="explore_back">Retour à Explorer</string>
     <string name="nav_bar_explore">Explorer</string>
@@ -160,7 +159,7 @@
     <string name="podcasts_load_error_title">Podcasts indisponibles</string>
     <string name="podcasts_retry">Réessayer</string>
     <string name="podcasts_empty_title">Aucun podcast à afficher</string>
-    <string name="podcasts_empty_body">YouTube Music ne propose pas de podcasts pour le moment.</string>
+    <string name="podcasts_empty_body">serveur de musique ne propose pas de podcasts pour le moment.</string>
     <string name="podcasts_loading_more">Chargement…</string>
     <string name="podcasts_load_more">Afficher la suite</string>
     <string name="podcasts_episodes">Épisodes</string>
@@ -174,11 +173,9 @@
     <string name="home_new_music_tag">Nouveautés</string>
     <string name="home_radio_eyebrow">Selon vos écoutes</string>
     <string name="home_new_release_tag">Nouvelle sortie d’un artiste écouté</string>
-    <string name="home_youtube_mix_tag">Mix YouTube Music</string>
-    <string name="home_youtube_radio_tag">Radio YouTube Music</string>
     <string name="home_artist_radio_tag">Radio d’un artiste associé</string>
     <string name="home_find_your_mood">Choisissez votre humeur</string>
-    <string name="home_find_your_mood_description">Lancez un mix issu des ambiances YouTube Music.</string>
+    <string name="home_find_your_mood_description">Lancez un mix issu des ambiances serveur de musique.</string>
     <string name="home_mood_energy">Énergie</string>
     <string name="home_mood_relax">Détente</string>
     <string name="home_mood_feeling_blue">Mélancolie</string>
@@ -299,14 +296,11 @@
     <string name="source_local">Local</string>
     <string name="source_addon">Module</string>
     <string name="source_spotify">Spotify</string>
-    <string name="source_youtube">YouTube Music</string>
     <string name="search_source_spotify">Spotify</string>
-    <string name="search_source_youtube">YouTube Music</string>
-    <string name="youtube_search_failed">La recherche YouTube Music a été interrompue.</string>
     <string name="local_file_missing">« %1$s » n’est pas sur cet appareil.</string>
     <string name="continue_without_account">Continuer sans compte</string>
     <string name="settings_account_signin_title">Se connecter à Spotify</string>
-    <string name="settings_account_signin_subtitle">Les morceaux Spotify sont lus depuis YouTube Music tant que vous n’êtes pas connecté.</string>
+    <string name="settings_account_signin_subtitle">Les morceaux Spotify sont lus depuis serveur de musique tant que vous n’êtes pas connecté.</string>
     <string name="settings_account_guest_subtitle">Non connecté</string>
     <string name="playlist_delete_spotify_confirm">Supprimer « %1$s » de votre bibliothèque Spotify ?</string>
     <string name="playlist_deleted">« %1$s » supprimée</string>
@@ -314,13 +308,13 @@
     <string name="playlist_exported">Playlist exportée</string>
     <string name="playlist_import">Importer une playlist</string>
     <string name="import_from_file">Fichier CSV exporté par Melo</string>
-    <string name="import_from_link">Lien YouTube, YouTube Music ou Spotify</string>
+    <string name="import_from_link">Lien serveur de musique, serveur de musique ou Spotify</string>
     <string name="import_link_label">Lien de la playlist</string>
     <string name="import_action">Importer</string>
     <string name="import_running">Importation…</string>
     <string name="import_done">« %1$s » importée : %2$d morceaux</string>
     <string name="import_no_tracks">Aucun morceau à importer.</string>
-    <string name="import_unknown_link">Ce lien n’est pas une playlist YouTube, YouTube Music ou Spotify.</string>
+    <string name="import_unknown_link">Ce lien n’est pas une playlist serveur de musique, serveur de musique ou Spotify.</string>
     <string name="spotify_link_unavailable">Melo n’a pas pu ouvrir ce lien Spotify.</string>
     <string name="share_spotify_link">Ouvrir le lien Spotify dans Melo</string>
     <string name="settings_link_handling_section">Gestion des liens</string>
@@ -405,38 +399,17 @@
     <string name="history_clear_message">Supprime les écoutes enregistrées sur cet appareil. L’historique de Spotify n’est pas modifié.</string>
     <string name="history_clear_confirm">Effacer</string>
     <string name="login_optional">Facultatif</string>
-    <!-- Compte Google et playlists YouTube Music -->
     <string name="action_ok">OK</string>
     <string name="settings_accounts_title">Comptes</string>
-    <string name="google_connect_title">Connecter un compte Google</string>
-    <string name="google_connect_subtitle">Vos playlists YouTube Music dans Melo, synchronisées avec le compte.</string>
     <string name="google_connected_subtitle">Compte Google</string>
-    <string name="google_disconnect_title">Déconnecter le compte Google</string>
-    <string name="google_disconnect_subtitle">Retire la session de cet appareil. Vos playlists restent sur YouTube Music.</string>
-    <string name="google_signin_title">Compte Google</string>
-    <string name="google_signin_checking">Ouverture de YouTube Music…</string>
-    <string name="google_signin_failed">YouTube Music n’a pas ouvert de session avec ce compte.</string>
     <string name="google_signin_retry">Réessayer</string>
-    <string name="google_signin_use_account">Utiliser ce compte</string>
-    <string name="google_session_closed">Google a fermé la session YouTube Music. Reconnectez le compte dans Réglages → Comptes.</string>
-    <string name="home_youtube_playlists">Playlists YouTube Music</string>
-    <string name="youtube_playlist_account">Sur mon compte YouTube Music</string>
-    <string name="youtube_playlist_public">Publique</string>
-    <string name="youtube_playlist_edit">Modifier la playlist YouTube Music</string>
-    <string name="youtube_playlist_failed">Cette playlist YouTube Music n’a pas pu être lue.</string>
-    <string name="youtube_playlist_only_youtube">Une playlist YouTube Music ne reçoit que des morceaux YouTube Music.</string>
-    <string name="youtube_playlist_row_gone">Ce morceau n’est plus dans la playlist.</string>
-    <string name="playlist_delete_youtube_confirm">Supprimer « %1$s » de votre compte YouTube Music ?</string>
-    <string name="playlist_remove_youtube_confirm">Retirer « %1$s » de votre bibliothèque YouTube Music ?</string>
 
     <!-- Convertisseur -->
     <string name="convert_to">Convertir vers…</string>
     <string name="convert_title">Convertisseur</string>
     <string name="convert_target_spotify">Nouvelle playlist sur votre compte Spotify</string>
-    <string name="convert_target_youtube">Nouvelle playlist sur votre compte YouTube Music</string>
     <string name="convert_target_multi">Nouvelle playlist sur cet appareil, morceaux gardés tels quels</string>
     <string name="convert_needs_spotify">Connectez-vous à Spotify dans Réglages → Comptes</string>
-    <string name="convert_needs_google">Connectez un compte Google dans Réglages → Comptes</string>
     <string name="convert_reading">Lecture de la playlist…</string>
     <string name="convert_read_failed">La playlist n’a pas pu être lue.</string>
     <string name="convert_searching">Recherche des correspondances : %1$d sur %2$d</string>
@@ -444,7 +417,6 @@
     <string name="convert_to_review">À vérifier (%1$d)</string>
     <string name="convert_create">Créer la playlist · %1$s</string>
     <string name="convert_failed">La playlist n’a pas pu être créée.</string>
-    <string name="youtube_refused">YouTube Music refuse les requêtes de cette connexion pour le moment. Réessayez dans quelques minutes.</string>
     <string name="convert_done">« %1$s » créée</string>
     <string name="convert_row_searching">Recherche…</string>
     <string name="convert_row_missing">Aucune correspondance</string>
@@ -466,7 +438,7 @@
     <string name="settings_player_menu_title">Bouton d’options dans le lecteur</string>
     <string name="settings_player_menu_subtitle">Afficher les options du titre dans le lecteur.</string>
     <string name="settings_normalization_title">Normaliser le volume</string>
-    <string name="settings_normalization_subtitle">Joue les titres à un volume comparable, d’après les valeurs publiées par Spotify et YouTube Music. Les fichiers locaux ne changent pas.</string>
+    <string name="settings_normalization_subtitle">Joue les titres à un volume comparable, d’après les valeurs publiées par Spotify et serveur de musique. Les fichiers locaux ne changent pas.</string>
     <string name="settings_mini_swipe_title">Balayage du mini-lecteur</string>
     <string name="settings_mini_swipe_subtitle">Vers la gauche ou la droite sur la barre en bas de l’écran. À gauche le titre suivant, à droite le précédent.</string>
     <string name="settings_mini_swipe_tracks">Changer de titre</string>
@@ -487,12 +459,7 @@
     <string name="artist_world_rank">N° %1$d dans le monde</string>
     <string name="artist_show_all">Tout afficher (%1$d)</string>
     <string name="artist_show_less">Réduire</string>
-    <plurals name="youtube_tracks_refused">
-        <item quantity="one">%1$d titre n’a pas pu être ajouté : YouTube Music l’a refusé.</item>
-        <item quantity="other">%1$d titres n’ont pas pu être ajoutés : YouTube Music les a refusés.</item>
-    </plurals>
     <string name="search_source_all">Tout</string>
-    <string name="search_source_youtube_short">YouTube</string>
     <string name="search_source_device">Appareil</string>
     <string name="queue_section_queued">File d’attente</string>
     <string name="queue_section_next_from">À suivre dans : %1$s</string>
@@ -516,10 +483,10 @@
     <string name="addons_direct_stream_subtitle">Lire les titres en file depuis vos modules quand ils les proposent</string>
     <string name="addons_add_one_first">Ajoutez d’abord un module</string>
     <string name="addons_lossless_upgrade">Passer en sans perte pendant la lecture</string>
-    <string name="addons_lossless_upgrade_subtitle">Basculer un titre lu depuis YouTube Music vers la copie sans perte du même enregistrement proposée par un module</string>
+    <string name="addons_lossless_upgrade_subtitle">Basculer un titre lu depuis serveur de musique vers la copie sans perte du même enregistrement proposée par un module</string>
     <string name="upgrade_quality">Améliorer la qualité</string>
     <string name="upgrade_searching">Recherche d’une version sans perte…</string>
-    <string name="addons_direct_stream_footer">Un titre qu’aucun module ne propose, ou déjà téléchargé, est toujours lu depuis YouTube Music. Si un flux de module échoue, la lecture continue depuis YouTube Music. Une amélioration ne bascule que vers une copie de même durée qui se lit, avec une courte coupure du son.</string>
+    <string name="addons_direct_stream_footer">Un titre qu’aucun module ne propose, ou déjà téléchargé, est toujours lu depuis serveur de musique. Si un flux de module échoue, la lecture continue depuis serveur de musique. Une amélioration ne bascule que vers une copie de même durée qui se lit, avec une courte coupure du son.</string>
     <string name="addons_tolerance">Tolérance de durée</string>
     <string name="addons_tolerance_value">%1$d s</string>
     <string name="addons_section">Vos modules</string>
@@ -589,7 +556,6 @@
     <string name="pipeline_route">Liaison</string>
     <string name="pipeline_direct">Lecture directe</string>
     <string name="pipeline_system_mixer">Mixeur système</string>
-    <string name="pipeline_source_youtube">YouTube Music</string>
     <string name="pipeline_source_device">Sur cet appareil</string>
     <string name="pipeline_source_addon">%1$s (module)</string>
     <string name="pipeline_route_speaker">Haut-parleur du téléphone</string>

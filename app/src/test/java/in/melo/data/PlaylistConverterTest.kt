@@ -1,7 +1,5 @@
 package `in`.melo.data
 
-import `in`.melo.data.youtube.YTM_PLAYLIST_PREFIX
-import `in`.melo.data.youtube.YTM_TRACK_PREFIX
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -16,23 +14,26 @@ import java.io.IOException
 class PlaylistConverterTest {
     private fun spotify(id: String, title: String, artist: String, seconds: Int) =
         Music("spotify:track:$id", title, artist, MusicKind.Track, durationMs = seconds * 1000)
-    private fun ytm(id: String, title: String, artist: String, seconds: Int) =
-        Music("$YTM_TRACK_PREFIX$id", title, artist, MusicKind.Track, durationMs = seconds * 1000)
+    private val SERVER_TRACK_PREFIX = "music-server:library:"
+    private val SERVER_PLAYLIST_PREFIX = "music-server-playlist:library:"
+
+    private fun server(id: String, title: String, artist: String, seconds: Int) =
+        Music("$SERVER_TRACK_PREFIX$id", title, artist, MusicKind.Track, durationMs = seconds * 1000)
     private fun file(id: Int, title: String, artist: String, seconds: Int) =
         Music("$LOCAL_TRACK_PREFIX$id", title, artist, MusicKind.Track, durationMs = seconds * 1000)
 
     @Test fun kindsAndWhatTheyAccept() {
         assertEquals(PlaylistKind.Spotify, playlistKindOf(Music("spotify:playlist:x", "", "", MusicKind.Playlist)))
         assertEquals(PlaylistKind.Spotify, playlistKindOf(Music("spotify:collection:tracks", "", "", MusicKind.Playlist)))
-        assertEquals(PlaylistKind.YouTubeMusic, playlistKindOf(Music("${YTM_PLAYLIST_PREFIX}PLx", "", "", MusicKind.Playlist)))
+        assertEquals(PlaylistKind.MusicServer, playlistKindOf(Music("${SERVER_PLAYLIST_PREFIX}PLx", "", "", MusicKind.Playlist)))
         assertEquals(PlaylistKind.MultiService, playlistKindOf(Music("${LOCAL_PLAYLIST_PREFIX}x", "", "", MusicKind.Playlist)))
         assertNull(playlistKindOf(Music("spotify:album:x", "", "", MusicKind.Album)))
         val track = spotify("a", "A", "B", 100)
         assertTrue(PlaylistKind.Spotify.accepts(track))
         assertTrue(PlaylistKind.Spotify.accepts(Music("spotify:local:Artist:Album:Title:200", "Title", "Artist", MusicKind.Track)))
-        assertFalse(PlaylistKind.YouTubeMusic.accepts(track))
+        assertFalse(PlaylistKind.MusicServer.accepts(track))
         assertTrue(PlaylistKind.MultiService.accepts(file(1, "x", "y", 1)))
-        assertEquals(PlaylistKind.YouTubeMusic, PlaylistKind.fromKey("youtube"))
+        assertEquals(PlaylistKind.MusicServer, PlaylistKind.fromKey("server"))
     }
 
     @Test fun searchTextDropsVersionsAndFeaturing() {
@@ -40,7 +41,7 @@ class PlaylistConverterTest {
     }
 
     @Test fun videoTitlesGiveTheSongTitle() {
-        fun title(text: String, channel: String) = ConversionMatching.songTitle(ytm("v", text, channel, 200))
+        fun title(text: String, channel: String) = ConversionMatching.songTitle(server("v", text, channel, 200))
         assertEquals("Peshta", title("Xamdam Sobirov - Peshta / Хамдам Собиров - Пешта", "Xamdam Sobirov"))
         assertEquals("체포하겠어 (You're Under Arrest)", title("ILLIT (아일릿) '체포하겠어 (You're Under Arrest)' Official MV", "ILLIT"))
         assertEquals("Ala Bolelo - Lyric Video", title("Ala Bolelo - Lyric Video | Jailer 2 | Superstar Rajinikanth", "Sun TV"))
@@ -48,7 +49,7 @@ class PlaylistConverterTest {
         assertEquals("Don't Stop Me Now", title("Don't Stop Me Now", "Queen"))
         // A Spotify title is never cut.
         assertEquals("Song - Live", ConversionMatching.songTitle(spotify("s", "Song - Live", "Artist", 100)))
-        assertEquals("Peshta Xamdam Sobirov", ConversionMatching.searchText(ytm("v", "Xamdam Sobirov - Peshta (Official Video)", "Xamdam Sobirov", 200)))
+        assertEquals("Peshta Xamdam Sobirov", ConversionMatching.searchText(server("v", "Xamdam Sobirov - Peshta (Official Video)", "Xamdam Sobirov", 200)))
     }
 
     private fun convert(
@@ -70,9 +71,9 @@ class PlaylistConverterTest {
     @Test fun aFailedSearchIsTriedAgain() = runBlocking {
         val track = spotify("1", "One More Time", "Daft Punk", 320)
         var calls = 0
-        val conversion = PlaylistConversion(this, Music("${LOCAL_PLAYLIST_PREFIX}src", "Source", "", MusicKind.Playlist), PlaylistKind.YouTubeMusic,
+        val conversion = PlaylistConversion(this, Music("${LOCAL_PLAYLIST_PREFIX}src", "Source", "", MusicKind.Playlist), PlaylistKind.MusicServer,
             loadTracks = { listOf(track) },
-            search = { if (++calls < 3) throw IOException("YouTube Music answered 429.") else listOf(ytm("orig", "One More Time", "Daft Punk", 321)) },
+            search = { if (++calls < 3) throw IOException("Server returned 429.") else listOf(server("orig", "One More Time", "Daft Punk", 321)) },
             retryBaseMs = 1)
         conversion.start()
         withTimeout(5_000) { conversion.state.first { it.finished } }
@@ -86,16 +87,16 @@ class PlaylistConverterTest {
         val doubtful = spotify("2", "Harder Better Faster Stronger", "Daft Punk", 224)
         val nothing = spotify("3", "Unreleased Demo", "Nobody", 200)
         val offline = spotify("4", "Veridis Quo", "Daft Punk", 345)
-        val already = ytm("keep", "Around the World", "Daft Punk", 429)
+        val already = server("keep", "Around the World", "Daft Punk", 429)
         val results = mapOf(
-            exact.id to listOf(ytm("cover", "One More Time (Piano Cover)", "Pianist", 300), ytm("orig", "One More Time", "Daft Punk", 321)),
-            doubtful.id to listOf(ytm("live", "Harder Better Faster Stronger (Alive 2007)", "Daft Punk", 330)),
-            nothing.id to listOf(ytm("other", "Something Else", "Somebody", 100)),
+            exact.id to listOf(server("cover", "One More Time (Piano Cover)", "Pianist", 300), server("orig", "One More Time", "Daft Punk", 321)),
+            doubtful.id to listOf(server("live", "Harder Better Faster Stronger (Alive 2007)", "Daft Punk", 330)),
+            nothing.id to listOf(server("other", "Something Else", "Somebody", 100)),
         )
-        convert(listOf(exact, already, doubtful, nothing, offline, exact), PlaylistKind.YouTubeMusic, results) { conversion ->
+        convert(listOf(exact, already, doubtful, nothing, offline, exact), PlaylistKind.MusicServer, results) { conversion ->
             val rows = conversion.state.value.rows
             assertEquals(MatchState.Found, rows[0].state)
-            assertEquals("${YTM_TRACK_PREFIX}orig", rows[0].choice?.id)
+            assertEquals("${SERVER_TRACK_PREFIX}orig", rows[0].choice?.id)
             assertEquals(MatchState.Same, rows[1].state)
             assertEquals(already, rows[1].choice)
             assertEquals(MatchState.Uncertain, rows[2].state)
@@ -108,7 +109,7 @@ class PlaylistConverterTest {
             assertEquals(rows[0].choice, rows[5].choice)
             assertEquals(3, conversion.state.value.toReview)
             // Kept rows, in the source order; missing ones are left out.
-            assertEquals(listOf("${YTM_TRACK_PREFIX}orig", "${YTM_TRACK_PREFIX}keep", "${YTM_TRACK_PREFIX}live", "${YTM_TRACK_PREFIX}orig"),
+            assertEquals(listOf("${SERVER_TRACK_PREFIX}orig", "${SERVER_TRACK_PREFIX}keep", "${SERVER_TRACK_PREFIX}live", "${SERVER_TRACK_PREFIX}orig"),
                 conversion.state.value.tracks.map(Music::id))
         }
     }
@@ -116,9 +117,9 @@ class PlaylistConverterTest {
     @Test fun userChoicesRemovalsAndCreation() {
         val first = spotify("1", "Song", "Artist", 200)
         val second = spotify("2", "Other", "Artist", 200)
-        val manual = ytm("manual", "Other (Remastered)", "Artist", 201)
-        val results = mapOf(first.id to listOf(ytm("one", "Song", "Artist", 200)), second.id to emptyList())
-        convert(listOf(first, second), PlaylistKind.YouTubeMusic, results) { conversion ->
+        val manual = server("manual", "Other (Remastered)", "Artist", 201)
+        val results = mapOf(first.id to listOf(server("one", "Song", "Artist", 200)), second.id to emptyList())
+        convert(listOf(first, second), PlaylistKind.MusicServer, results) { conversion ->
             assertEquals(MatchState.Missing, conversion.state.value.rows[1].state)
             conversion.choose(1, manual)
             val chosen = conversion.state.value.rows[1]
@@ -130,11 +131,11 @@ class PlaylistConverterTest {
             conversion.restore(0)
             conversion.rename("  Copy  ")
             var received: Pair<String, List<Music>>? = null
-            conversion.create(creator = { name, tracks -> received = name to tracks; Music("${YTM_PLAYLIST_PREFIX}new", name, "", MusicKind.Playlist) },
+            conversion.create(creator = { name, tracks -> received = name to tracks; Music("${SERVER_PLAYLIST_PREFIX}new", name, "", MusicKind.Playlist) },
                 failed = { "failed" })
             withTimeout(5_000) { conversion.state.first { it.created != null } }
             assertEquals("Copy", received?.first)
-            assertEquals(listOf("${YTM_TRACK_PREFIX}one", manual.id), received?.second?.map(Music::id))
+            assertEquals(listOf("${SERVER_TRACK_PREFIX}one", manual.id), received?.second?.map(Music::id))
         }
     }
 
@@ -151,7 +152,7 @@ class PlaylistConverterTest {
     }
 
     @Test fun everythingGoesAsItIsIntoAMultiServicePlaylist() {
-        val tracks = listOf(spotify("1", "A", "B", 1), ytm("y", "C", "D", 2), file(3, "E", "F", 3))
+        val tracks = listOf(spotify("1", "A", "B", 1), server("y", "C", "D", 2), file(3, "E", "F", 3))
         convert(tracks, PlaylistKind.MultiService, emptyMap()) { conversion ->
             assertTrue(conversion.state.value.rows.all { it.state == MatchState.Same })
             assertEquals(tracks, conversion.state.value.tracks)
@@ -160,8 +161,8 @@ class PlaylistConverterTest {
     }
 
     @Test fun creationFailureIsShownAndCanBeRetried() {
-        val track = ytm("y", "C", "D", 2)
-        convert(listOf(track), PlaylistKind.YouTubeMusic, emptyMap()) { conversion ->
+        val track = server("y", "C", "D", 2)
+        convert(listOf(track), PlaylistKind.MusicServer, emptyMap()) { conversion ->
             conversion.create(creator = { _, _ -> throw IOException("refused") }, failed = { "Could not create: ${it.message}" })
             withTimeout(5_000) { conversion.state.first { it.error != null } }
             assertEquals("Could not create: refused", conversion.state.value.error)

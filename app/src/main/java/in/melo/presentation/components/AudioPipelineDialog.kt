@@ -197,7 +197,7 @@ fun AudioPipelineDialog(onDismiss: () -> Unit) {
                         // 1. The track as it was read.
                         val source = when (pipeline.sourceKind) {
                             AudioPipeline.SourceKind.None -> dash
-                            AudioPipeline.SourceKind.YouTube -> stringResource(R.string.pipeline_source_youtube)
+                            AudioPipeline.SourceKind.Server -> stringResource(R.string.music_server_title)
                             AudioPipeline.SourceKind.Device -> stringResource(R.string.pipeline_source_device)
                             // Some add-ons put account details after their name; the name is enough here.
                             AudioPipeline.SourceKind.Addon -> pipeline.addonName?.substringBefore(" · ")?.trim()

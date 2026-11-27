@@ -115,13 +115,8 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
     val isPinned = pins.any { it.id == playlistId }
     val isLiked = playlistId == ui.likedSongs.id
     val isLocalList = playlistId.startsWith(LOCAL_PLAYLIST_PREFIX)
-    val isYouTubeList = playlistId.startsWith(`in`.melo.data.youtube.YTM_PLAYLIST_PREFIX)
-    val google by model.youTubeAccount.collectAsStateWithLifecycle()
-    val youTubeEditable by model.youTubeEditable.collectAsStateWithLifecycle()
-    val youTubePlaylists by model.youTubePlaylists.collectAsStateWithLifecycle()
-    // The Google account's own playlist: its page showed the editing header, or the library names the account as its owner.
-    val ownsYouTube = isYouTubeList && google != null && (playlistId in youTubeEditable || model.youTubePlaylistOwned(current))
-    val inYouTubeLibrary = isYouTubeList && google != null && youTubePlaylists.any { it.id == playlistId }
+    val isServerList = `in`.melo.data.server.MusicServerUris.isPlaylist(playlistId)
+    val ownsServer = model.ownsServerPlaylist(current)
     val playlistKind = `in`.melo.data.playlistKindOf(current)
     val library by model.library.collectAsStateWithLifecycle()
     val inSpotifyLibrary = discovery.spotifyEnabled && library.content?.playlists?.any { it.id == playlistId } == true
@@ -135,7 +130,7 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
     var addingSuggestion by remember { mutableStateOf<String?>(null) }
     var suggestionRevision by remember { mutableStateOf(0) }
     LaunchedEffect(playlistId, current.ownerUsername, online) {
-        if (!isLocalList && !isYouTubeList && !isLiked && online) {
+        if (!isLocalList && !isServerList && !isLiked && online) {
             isOwned = runCatching {
                 current.ownerUsername?.let { it == SpotifyAccount.require(context).username() } ?: model.spotifyPlaylists.isOwned(playlistId)
             }.getOrDefault(false)
@@ -170,13 +165,13 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
     // Removes the row shown at a position of the displayed (possibly sorted) list.
     val removeAt: ((Int) -> Unit)? = when {
         isLocalList -> { index -> visible.getOrNull(index)?.let { model.localPlaylistStore.removeAt(playlistId, it.first) } }
-        (isOwned && !isLiked || ownsYouTube) && online -> { index ->
+        (isOwned && !isLiked || ownsServer) && online -> { index ->
             visible.getOrNull(index)?.let { (position, _) ->
                 if (!removing) {
                     removing = true
                     scope.launch {
                         try {
-                            if (isYouTubeList) model.removeYouTubePlaylistTrack(current, position)
+                            if (isServerList) model.editServerPlaylist(current, remove = position)
                             else model.removeSpotifyPlaylistTrack(current, position)
                         }
                         catch (cancelled: CancellationException) { throw cancelled }
@@ -206,10 +201,10 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
             .collect { last -> if (content?.nextPage != null && last >= songs.size - 12) model.loadDetail(item, more = true) }
     }
 
-    // Keep source labels for device and YouTube playlists; Spotify's subtitle may expose its owner ID.
+    // The device and server labels identify where the playlist is saved.
     val sourceName = when {
         isLocalList -> stringResource(R.string.badge_local)
-        isYouTubeList -> stringResource(R.string.search_source_youtube)
+        isServerList -> stringResource(R.string.music_server_title)
         else -> null
     }
     CollectionDetailLayout(
@@ -224,12 +219,12 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
                 search = if (reordering) null else PlayRowSearch(filter) { filter = it },
             )
             val shareContext = LocalContext.current
-            val editable = isLocalList || isOwned || ownsYouTube
+            val editable = isLocalList || isOwned || ownsServer
             val actions = buildList {
                 add(downloadAction(ui, current))
                 if (editable) add(ActionSpec(DetailAction.ADD_TRACKS, MeloIcons.Add, stringResource(R.string.playlist_add_tracks),
                     { addingTracks = true }, enabled = isLocalList || online))
-                if (!isLocalList && !isYouTubeList && !isLiked && discovery.spotifyEnabled) add(ActionSpec(DetailAction.SAVE,
+                if (!isLocalList && !isServerList && !isLiked && discovery.spotifyEnabled) add(ActionSpec(DetailAction.SAVE,
                     if (playlistId in saved) MeloIcons.Favorite else MeloIcons.FavoriteBorder,
                     stringResource(if (playlistId in saved) R.string.saved_remove else R.string.saved_add), { model.toggleFavorite(current) },
                     selected = playlistId in saved))
@@ -241,7 +236,7 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
                     selected = reordering))
                 if (editable) add(ActionSpec(DetailAction.EDIT, MeloIcons.Edit, stringResource(R.string.detail_edit), { renaming = true },
                     enabled = isLocalList || online))
-                if (!isLocalList && !isYouTubeList && discovery.spotifyEnabled) add(ActionSpec(DetailAction.RADIO, MeloIcons.Radio, stringResource(R.string.radio_related),
+                if (!isLocalList && !isServerList && discovery.spotifyEnabled) add(ActionSpec(DetailAction.RADIO, MeloIcons.Radio, stringResource(R.string.radio_related),
                     { ui.startRadio(current) { navController.openMusic(ui, it) } }))
                 if (current.spotifyShareUrl() != null) add(ActionSpec(DetailAction.SHARE, MeloIcons.Share, stringResource(R.string.detail_share),
                     { shareContext.shareMusic(current) }))
@@ -249,7 +244,7 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
                     enabled = content != null))
                 if (playlistKind != null) add(ActionSpec(DetailAction.CONVERT, MeloIcons.SwapHoriz, stringResource(R.string.convert_to),
                     { converting = true }, enabled = content != null && !content.tracks.isEmpty()))
-                if (isLocalList || (inSpotifyLibrary && !isLiked) || inYouTubeLibrary) add(ActionSpec(DetailAction.DELETE, MeloIcons.Delete,
+                if (isLocalList || (inSpotifyLibrary && !isLiked) || ownsServer) add(ActionSpec(DetailAction.DELETE, MeloIcons.Delete,
                     stringResource(R.string.playlist_delete), { deleting = true }, destructive = true))
             }
             DetailActionBar(DetailPage.PLAYLIST, actions, ui)
@@ -361,10 +356,10 @@ fun PlaylistDetailScreen(model: MeloModel, navController: NavHostController, pla
         target = playlistKind ?: `in`.melo.data.PlaylistKind.MultiService,
         onAddLocal = { tracks -> model.localPlaylistStore.add(playlistId, tracks) },
         onAddRemote = { tracks ->
-            if (isYouTubeList) model.addYouTubePlaylistTracks(current, tracks) else model.addSpotifyPlaylistTracks(current, tracks)
+            if (isServerList) model.editServerPlaylist(current, tracks = tracks) else model.addSpotifyPlaylistTracks(current, tracks)
         },
         onDismiss = { addingTracks = false })
-    if (renaming && ownsYouTube) `in`.melo.presentation.components.YouTubePlaylistEditor(model, current) { renaming = false }
+    if (renaming && ownsServer) `in`.melo.presentation.components.ServerPlaylistEditor(model, current) { renaming = false }
     if (converting) ConvertTargetSheet(model, current, onDismiss = { converting = false }) { kind ->
         converting = false
         ui.register(current)

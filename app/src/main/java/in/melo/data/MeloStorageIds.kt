@@ -8,7 +8,6 @@ internal object MeloStorageIds {
     val downloadNotificationChannel = decode("c3BvdGlmZXVyX2Rvd25sb2Fkcw==")
     val backupFormat = decode("c3BvdGlmZXVyLWJhY2t1cA==")
     val nativeKeyAliasPrefix = decode("c3BvdGlmZXVyLW5hdGl2ZS1rZXlzLQ==")
-    val youtubeAccountKeyAlias = decode("c3BvdGlmZXVyLXlvdXR1YmUtYWNjb3VudA==")
 
     private fun decode(encoded: String) = String(Base64.getDecoder().decode(encoded), Charsets.UTF_8)
 }

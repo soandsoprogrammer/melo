@@ -114,13 +114,11 @@ fun AddToLocalPlaylistSheet(item: Music, ui: PlayerViewModel, onDismiss: () -> U
     LaunchedEffect(Unit) { username = runCatching { SpotifyAccount.require(context).username() }.getOrNull() }
     // A Spotify playlist takes Spotify tracks and local files; multi-service playlists take everything.
     // Local files are added as Spotify's own local file references.
-    val spotifyItem = item.kind != `in`.melo.data.MusicKind.Track || item.source != `in`.melo.data.MusicSource.YouTubeMusic
+    val isServerItem = item.source == `in`.melo.data.MusicSource.MusicServer
+    val spotifyItem = !isServerItem
     val accountPlaylists = library.content?.playlists.orEmpty().filter { spotifyItem && username != null && it.ownerUsername == username }
-    // A YouTube Music playlist of the Google account takes YouTube Music tracks and playlists.
-    val youTubeEditable by ui.model.youTubeEditable.collectAsStateWithLifecycle()
-    val youTubeAll by ui.model.youTubePlaylists.collectAsStateWithLifecycle()
-    val youTubeItem = item.id.startsWith("ytm:")
-    val youTubePlaylists = if (!youTubeItem) emptyList() else youTubeAll.filter { it.id != item.id && (it.id in youTubeEditable || ui.model.youTubePlaylistOwned(it)) }
+    val serverLists by ui.model.serverPlaylists.collectAsStateWithLifecycle()
+    val serverPlaylists = if (!isServerItem) emptyList() else serverLists.filter { it.id != item.id && ui.model.ownsServerPlaylist(it) }
     var creating by remember { mutableStateOf(false) }
     `in`.melo.presentation.components.MeloBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).navigationBarsPadding()) {
@@ -159,12 +157,12 @@ fun AddToLocalPlaylistSheet(item: Music, ui: PlayerViewModel, onDismiss: () -> U
                         Text("Spotify", style = MaterialTheme.typography.labelSmall)
                     }
                 }
-                items(youTubePlaylists, key = { it.id }) { playlist ->
+                items(serverPlaylists, key = { it.id }) { playlist ->
                     Row(Modifier.fillMaxWidth().clip(MeloLayout.PanelShape).clickable(enabled = !adding) {
                         adding = true
                         scope.launch {
                             try {
-                                ui.model.addYouTubePlaylistTracks(playlist, ui.model.tracksOf(item))
+                                ui.model.editServerPlaylist(playlist, tracks = ui.model.tracksOf(item))
                                 ui.model.showMessage(addedMessage); onDismiss()
                             } catch (cancelled: CancellationException) { throw cancelled }
                             catch (failure: Exception) { ui.model.showMessage(failure.message.orEmpty()) }
@@ -174,7 +172,7 @@ fun AddToLocalPlaylistSheet(item: Music, ui: PlayerViewModel, onDismiss: () -> U
                         SmartImage(model = playlist.imageUrl, contentDescription = null, shape = MeloLayout.CardShape,
                             targetSize = SmartImageCompactListTargetSize, modifier = Modifier.size(44.dp))
                         Text(playlist.title, Modifier.weight(1f).padding(horizontal = 12.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("YouTube Music", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.music_server_title), style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 items(playlists, key = { it.id }) { playlist ->

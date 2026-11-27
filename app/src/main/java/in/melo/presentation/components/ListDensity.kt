@@ -31,7 +31,6 @@ fun listSpacing(): Dp = if (LocalCompactLists.current) 3.dp else 8.dp
 fun SourceBadge(source: MusicSource, modifier: Modifier = Modifier, tint: Color = LocalContentColor.current.copy(alpha = MeloAlpha.Secondary)) {
     val description = stringResource(when (source) {
         MusicSource.Spotify -> R.string.source_spotify
-        MusicSource.YouTubeMusic -> R.string.source_youtube
         MusicSource.Local -> R.string.source_local
         MusicSource.Addon -> R.string.source_addon
         MusicSource.MusicServer -> R.string.music_server_title
@@ -39,7 +38,6 @@ fun SourceBadge(source: MusicSource, modifier: Modifier = Modifier, tint: Color 
     val iconModifier = modifier.size(14.dp)
     when (source) {
         MusicSource.Spotify -> Icon(meloPainter(R.drawable.ic_source_spotify), description, iconModifier, tint = tint)
-        MusicSource.YouTubeMusic -> Icon(meloPainter(R.drawable.ic_source_youtube_music), description, iconModifier, tint = tint)
         MusicSource.Local -> Icon(MeloIcons.Folder, description, iconModifier, tint = tint)
         MusicSource.Addon -> Icon(MeloIcons.Link, description, iconModifier, tint = tint)
         MusicSource.MusicServer -> Icon(MeloIcons.MusicNote, description, iconModifier, tint = tint)

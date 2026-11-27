@@ -18,7 +18,6 @@ import `in`.melo.data.preferences.AppSettings
 import `in`.melo.presentation.screens.AlbumDetailScreen
 import `in`.melo.presentation.screens.ArtistDetailScreen
 import `in`.melo.presentation.screens.HomeScreen
-import `in`.melo.presentation.screens.YouTubeExploreScreen
 import `in`.melo.presentation.screens.LibraryScreen
 import `in`.melo.presentation.screens.MusicServerScreen
 import `in`.melo.presentation.screens.PlaylistDetailScreen
@@ -52,9 +51,7 @@ fun AppNavigation(
         navController = navController,
         startDestination = when (defaultTab) {
             AppSettings.TAB_SEARCH -> Screen.Search.route
-            AppSettings.TAB_EXPLORE -> Screen.Explore.route
             AppSettings.TAB_LIBRARY -> Screen.Library.route
-            AppSettings.TAB_PODCASTS -> Screen.Podcasts.route
             else -> Screen.Home.route
         },
         enterTransition = { transitions.enter(initialState.destination.route, targetState.destination.route) },
@@ -63,16 +60,13 @@ fun AppNavigation(
         popExitTransition = { transitions.exit(initialState.destination.route, targetState.destination.route, isPop = true) },
     ) {
         composable(Screen.Home.route) { HomeScreen(model, navController, paddingValues) }
-        composable(Screen.Explore.route) { YouTubeExploreScreen(model, navController, paddingValues) }
         composable(Screen.Search.route) { SearchScreen(model, navController, paddingValues, onSearchBarActiveChange) }
         composable(Screen.Library.route) { LibraryScreen(model, navController, paddingValues) }
         composable(Screen.MusicServer.route) {
             MusicServerScreen(model, paddingValues) { navController.popBackStack() }
         }
-        composable(Screen.Podcasts.route) { `in`.melo.presentation.screens.PodcastsScreen(model, navController, paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(model, navController) }
         composable(Screen.History.route) { `in`.melo.presentation.screens.HistoryScreen(model, navController) }
-        composable(Screen.GoogleSignIn.route) { `in`.melo.presentation.screens.GoogleSignInScreen(model, navController) }
         composable(Screen.DiscordLogin.route) { `in`.melo.presentation.screens.DiscordLoginScreen(model, navController) }
         composable(
             Screen.Convert.route,
@@ -82,13 +76,6 @@ fun AppNavigation(
             `in`.melo.presentation.screens.ConvertScreen(model, navController, id, entry.arguments?.getString("target").orEmpty())
         }
         composable(Screen.Equalizer.route) { EqualizerScreen(navController = navController, playerViewModel = model.ui) }
-        composable(
-            Screen.PodcastDetail.route,
-            arguments = listOf(navArgument("browseId") { type = NavType.StringType }),
-        ) { entry ->
-            val browseId = URLDecoder.decode(entry.arguments?.getString("browseId").orEmpty(), "UTF-8")
-            `in`.melo.presentation.screens.PodcastDetailScreen(model, navController, browseId)
-        }
         composable(
             Screen.SettingsCategory.route,
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType }),

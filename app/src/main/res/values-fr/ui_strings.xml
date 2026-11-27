@@ -470,9 +470,6 @@
     <string name="settings_downloads_clear_text">%1$d titres (%2$s) seront supprimés de cet appareil. Vous pourrez les télécharger à nouveau.</string>
     <string name="settings_downloads_clear_action">Supprimer</string>
     <string name="settings_logout_confirm">Se déconnecter de Spotify ?</string>
-    <string name="google_disconnect_confirm">Déconnecter le compte Google ?</string>
-    <string name="google_disconnect_action">Déconnecter</string>
-    <string name="settings_youtube_account_refresh">YouTube Music · Touchez pour actualiser la bibliothèque</string>
     <string name="settings_logout_spotify">Se déconnecter de Spotify</string>
     <string name="settings_app_style_title">Style de l’app</string>
     <string name="settings_app_style_subtitle">La matière des barres, menus et cartes.</string>
@@ -520,7 +517,7 @@
     <string name="onboarding_history_title">Historique d’écoute</string>
     <string name="onboarding_history_body">Tout ce que vous avez écouté, du plus récent au plus ancien. Quand une nouvelle version de Melo sort, une flèche de mise à jour prend cette place.</string>
     <string name="onboarding_profile_title">Comptes et réglages</string>
-    <string name="onboarding_profile_body">Votre profil permet de connecter Spotify et YouTube Music, et donne accès aux Réglages.</string>
+    <string name="onboarding_profile_body">Votre profil permet de connecter Spotify et serveur de musique, et donne accès aux Réglages.</string>
     <string name="onboarding_library_title">Votre bibliothèque</string>
     <string name="onboarding_library_body">Vos playlists, albums, artistes, téléchargements et la musique de ce téléphone, réunis au même endroit.</string>
     <string name="onboarding_finish_title">Tout est prêt</string>

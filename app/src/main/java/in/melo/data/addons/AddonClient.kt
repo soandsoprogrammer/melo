@@ -1,7 +1,6 @@
 package `in`.melo.data.addons
 
 import `in`.melo.BuildConfig
-import `in`.melo.data.youtube.YouTubeMusic
 import android.util.Log
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -211,7 +210,7 @@ class AddonClient(rawBaseUrl: String, private val pickedQuality: String? = null)
 
         /** Melo's client, so offline mode stops add-ons too; longer waits, since add-ons resolve upstream. */
         internal val client: OkHttpClient by lazy {
-            YouTubeMusic.http.newBuilder()
+            `in`.melo.data.CatalogHttp.client.newBuilder()
                 .readTimeout(60, TimeUnit.SECONDS)
                 .callTimeout(45, TimeUnit.SECONDS)
                 .build()

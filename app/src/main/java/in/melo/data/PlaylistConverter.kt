@@ -1,9 +1,6 @@
 package `in`.melo.data
 
-import `in`.melo.data.youtube.MatchQuery
-import `in`.melo.data.youtube.TrackMatcher
-import `in`.melo.data.youtube.YTM_PLAYLIST_PREFIX
-import `in`.melo.data.youtube.YTM_TRACK_PREFIX
+import `in`.melo.data.server.MusicServerUris
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -20,15 +17,15 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.ConcurrentHashMap
 
-/** The three kinds of playlists: on the Spotify account, on the Google account, or multi-service on the device. */
+/** Playlists on an account or stored on this device. */
 enum class PlaylistKind(val key: String) {
-    Spotify("spotify"), YouTubeMusic("youtube"), MultiService("multi");
+    Spotify("spotify"), MusicServer("server"), MultiService("multi");
 
     /** Whether [track] goes as it is into a playlist of this kind. */
     fun accepts(track: Music): Boolean = when (this) {
         MultiService -> true
         Spotify -> track.id.startsWith("spotify:track:") || track.id.startsWith(SPOTIFY_LOCAL_PREFIX)
-        YouTubeMusic -> track.id.startsWith(YTM_TRACK_PREFIX)
+        MusicServer -> MusicServerUris.isTrack(track.id)
     }
 
     companion object {
@@ -39,7 +36,7 @@ enum class PlaylistKind(val key: String) {
 fun playlistKindOf(item: Music): PlaylistKind? = when {
     item.kind != MusicKind.Playlist -> null
     item.id.startsWith(LOCAL_PLAYLIST_PREFIX) -> PlaylistKind.MultiService
-    item.id.startsWith(YTM_PLAYLIST_PREFIX) -> PlaylistKind.YouTubeMusic
+    MusicServerUris.isPlaylist(item.id) -> PlaylistKind.MusicServer
     item.id.startsWith("spotify:playlist:") || item.id == "spotify:collection:tracks" -> PlaylistKind.Spotify
     else -> null
 }
@@ -99,7 +96,7 @@ fun interface MatchSearch {
     suspend fun candidates(track: Music): List<Music>
 }
 
-/** Scores candidates as the YouTube Music matching of Spotify tracks does: title, artists, duration, version words. */
+/** Scores candidates by their metadata: title, artists, duration, version words. */
 object ConversionMatching {
     const val CONFIDENT = 0.8
     const val ACCEPTED = 0.55
@@ -107,11 +104,11 @@ object ConversionMatching {
     fun query(track: Music) = MatchQuery(track.id, songTitle(track), track.subtitle, track.durationMs, track.album)
 
     /**
-     * The song title of a YouTube video title: "Artist - Title (Official Video)", "Title | Film | Cast",
+     * The song title of a catalogue video title: "Artist - Title (Official Video)", "Title | Film | Cast",
      * "Artist 'Title' Official MV", "Title / Титул". Other titles are returned as they are.
      */
     fun songTitle(track: Music): String {
-        if (!track.id.startsWith(YTM_TRACK_PREFIX)) return track.title
+        if (!MusicServerUris.isTrack(track.id)) return track.title
         var title = track.title.substringBefore(" | ").trim()
         QUOTED.find(title)?.let { quoted ->
             val inside = quoted.groupValues.drop(1).first(String::isNotEmpty)

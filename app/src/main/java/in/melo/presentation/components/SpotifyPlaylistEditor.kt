@@ -48,12 +48,11 @@ internal fun SpotifyPlaylistEditor(
     val discovery by model.discovery.collectAsState()
     // Without a Spotify account, every new playlist is a multi-service playlist.
     val signedIn = discovery.spotifyEnabled
-    val google by model.youTubeAccount.collectAsState()
-    // A YouTube Music playlist only takes YouTube Music tracks.
-    val youTubeAllowed = playlist == null && google != null && (initialItem == null || initialItem.id.startsWith("ytm:"))
-    var destination by remember { mutableStateOf(if (signedIn) PlaylistKind.Spotify else PlaylistKind.MultiService) }
+    val serverLibrary by model.serverLibrary.collectAsState()
+    val serverAllowed = playlist == null && serverLibrary != null && (initialItem == null || PlaylistKind.MusicServer.accepts(initialItem))
+    var destination by remember { mutableStateOf(when { playlist != null -> PlaylistKind.Spotify; serverAllowed -> PlaylistKind.MusicServer; signedIn && initialItem?.let { PlaylistKind.MusicServer.accepts(it) } != true -> PlaylistKind.Spotify; else -> PlaylistKind.MultiService }) }
     val local = destination == PlaylistKind.MultiService
-    val youTube = destination == PlaylistKind.YouTubeMusic
+    val onServer = destination == PlaylistKind.MusicServer
     var published by remember { mutableStateOf(false) }
     var knownVisibility by remember { mutableStateOf(playlist == null) }
     var image by remember { mutableStateOf<Uri?>(null) }
@@ -72,8 +71,8 @@ internal fun SpotifyPlaylistEditor(
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(name, { name = it.take(100) }, label = { Text(stringResource(R.string.playlist_name)) }, singleLine = true, enabled = !busy)
                 val choices = buildList {
-                    if (signedIn) add(PlaylistKind.Spotify to R.string.spotify_playlist_account)
-                    if (youTubeAllowed) add(PlaylistKind.YouTubeMusic to R.string.youtube_playlist_account)
+                    if (signedIn && initialItem?.let { PlaylistKind.MusicServer.accepts(it) } != true) add(PlaylistKind.Spotify to R.string.spotify_playlist_account)
+                    if (serverAllowed) add(PlaylistKind.MusicServer to R.string.music_server_title)
                     add(PlaylistKind.MultiService to R.string.spotify_playlist_device)
                 }
                 if (playlist == null && choices.size > 1) choices.forEach { (kind, label) ->
@@ -82,7 +81,7 @@ internal fun SpotifyPlaylistEditor(
                         Text(stringResource(label), Modifier.clickable(enabled = !busy) { destination = kind })
                     }
                 }
-                if (!youTube) {
+                if (!onServer) {
                     if (image != null || playlist?.imageUrl != null) AsyncImage(image ?: playlist?.imageUrl, null, Modifier.size(100.dp))
                     MeloButton(
                         text = stringResource(R.string.spotify_playlist_cover),
@@ -92,9 +91,9 @@ internal fun SpotifyPlaylistEditor(
                         style = MeloButtonStyle.Outlined,
                     )
                 }
-                if (!local) {
+                if (!local && !onServer) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(if (youTube) R.string.youtube_playlist_public else R.string.spotify_playlist_profile), Modifier.weight(1f))
+                        Text(stringResource(R.string.spotify_playlist_profile), Modifier.weight(1f))
                         MeloSwitch(published, { published = it }, enabled = !busy && knownVisibility)
                     }
                 }
@@ -103,7 +102,7 @@ internal fun SpotifyPlaylistEditor(
             }
         },
         confirmButton = {
-            MeloButton(text = stringResource(R.string.action_save), enabled = !busy && name.isNotBlank() && (local || knownVisibility), onClick = {
+            MeloButton(text = stringResource(R.string.action_save), enabled = !busy && name.isNotBlank() && (local || onServer && serverAllowed || knownVisibility && !onServer), onClick = {
                 busy = true; error = null
                 scope.launch {
                     try {
@@ -115,8 +114,8 @@ internal fun SpotifyPlaylistEditor(
                             if (tracks.isNotEmpty()) model.localPlaylistStore.add(created.id, tracks)
                             if (jpeg != null) model.setLocalPlaylistCover(created.id, jpeg)
                             onSaved(model.localPlaylistStore.get(created.id)?.asMusic() ?: created.asMusic()); onDismiss()
-                        } else if (youTube) {
-                            onSaved(model.createYouTubePlaylist(name, tracks, published)); onDismiss()
+                        } else if (onServer) {
+                            onSaved(model.createServerPlaylist(name, tracks)); onDismiss()
                         } else {
                             val created = if (playlist == null) model.createSpotifyPlaylist(name, tracks, published) else playlist.also {
                                 if (name.trim() != it.title) model.spotifyPlaylists.rename(it.id, name)
@@ -238,40 +237,29 @@ internal fun LocalPlaylistEditor(model: MeloModel, playlist: Music, onDismiss: (
     )
 }
 
-/** Name and visibility of a playlist on the Google account. YouTube Music sets its cover from the tracks. */
+/** Renames a playlist stored on the music server. */
 @Composable
-internal fun YouTubePlaylistEditor(model: MeloModel, playlist: Music, onDismiss: () -> Unit) {
+internal fun ServerPlaylistEditor(model: MeloModel, playlist: Music, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     val saveFailure = stringResource(R.string.spotify_playlist_failed)
     var name by remember { mutableStateOf(playlist.title) }
-    var public by remember { mutableStateOf(false) }
-    var known by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(playlist.id) {
-        try { public = model.youTubePlaylistPublic(playlist); known = true }
-        catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { error = saveFailure }
-    }
     MeloAlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
-        title = { Text(stringResource(R.string.youtube_playlist_edit)) },
+        title = { Text(stringResource(R.string.spotify_playlist_edit)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(name, { name = it.take(150) }, label = { Text(stringResource(R.string.playlist_name)) }, singleLine = true, enabled = !busy)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.youtube_playlist_public), Modifier.weight(1f))
-                    MeloSwitch(public, { public = it }, enabled = !busy && known)
-                }
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                if (busy || !known && error == null) LinearProgressIndicator(Modifier.fillMaxWidth())
+                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
-            MeloButton(text = stringResource(R.string.action_save), enabled = !busy && known && name.isNotBlank(), onClick = {
+            MeloButton(text = stringResource(R.string.action_save), enabled = !busy && name.isNotBlank(), onClick = {
                 busy = true; error = null
                 scope.launch {
-                    try { model.editYouTubePlaylist(playlist, name, public); onDismiss() }
+                    try { model.editServerPlaylist(playlist, name = name); onDismiss() }
                     catch (cancelled: CancellationException) { throw cancelled }
                     catch (failure: Exception) { error = saveFailure }
                     finally { busy = false }

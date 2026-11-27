@@ -37,7 +37,6 @@ class MeloPlaybackService : MediaSessionService() {
     private var recovery: PlaybackRecovery? = null
     private var normalizingSink: NormalizingAudioSink? = null
     private var discord: DiscordPresence? = null
-    private var upgrader: LosslessUpgrader? = null
     private val effectsScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main.immediate + kotlinx.coroutines.SupervisorJob())
     override fun onCreate() {
         super.onCreate()
@@ -48,12 +47,11 @@ class MeloPlaybackService : MediaSessionService() {
                     .apply { if (BuildConfig.BUILD_TYPE == "debug") setAudioProcessors(arrayOf(SignalProbe())) }.build())
                     .also { normalizingSink = it }
         }
-        // YouTube Music requests have no known length: they use their own chain, keyed by track.
-        val youtube = youTubeCacheChain(this)
+        val server = serverCacheChain(this)
         `in`.melo.data.addons.AddonResolver.init(this)
         val player = ExoPlayer.Builder(this, renderers)
-            .setMediaSourceFactory(MeloMediaSourceFactory(this, ProgressiveMediaSource.Factory(DefaultDataSource.Factory(this)),
-                ProgressiveMediaSource.Factory(youtube.kept).setLoadErrorHandlingPolicy(ResilientLoadPolicy())))
+            .setMediaSourceFactory(MeloMediaSourceFactory(ProgressiveMediaSource.Factory(DefaultDataSource.Factory(this)),
+                ProgressiveMediaSource.Factory(server.kept).setLoadErrorHandlingPolicy(ResilientLoadPolicy())))
             .setAudioAttributes(AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).build(), true)
             .setHandleAudioBecomingNoisy(true).setWakeMode(C.WAKE_MODE_NETWORK).build()
         // Buffering between tracks is still listening: count the intent to play, not only sound.
@@ -65,7 +63,6 @@ class MeloPlaybackService : MediaSessionService() {
         var listeningCatalog = "other"
         fun telemetryCatalog(): String = when (musicSourceOf(player.currentMediaItem?.mediaId.orEmpty())) {
             MusicSource.Spotify -> "spotify_catalog"
-            MusicSource.YouTubeMusic -> "youtube_music"
             MusicSource.Local -> "local"
             MusicSource.Addon -> "addon"
             MusicSource.MusicServer -> "music_server"
@@ -135,16 +132,6 @@ class MeloPlaybackService : MediaSessionService() {
             }
             override fun onPlayerError(error: PlaybackException) {
                 finishBuffering()
-                // An add-on copy that fails mid-play gives way to YouTube Music, at the same position.
-                val failed = player.currentMediaItem
-                // A switched copy is put back by LosslessUpgrader instead.
-                if (failed != null && YouTubeUris.isYouTube(failed.localConfiguration?.uri) &&
-                    !LosslessUpgrade.isMarked(failed.localConfiguration?.uri) &&
-                    AddonPlayback.served.remove(failed.mediaId) != null) {
-                    `in`.melo.data.addons.AddonResolver.forget(failed.mediaId)
-                    player.prepare()
-                    return
-                }
                 UsageAnalytics.playbackError(this@MeloPlaybackService, telemetryCatalog(), errorCategory(error))
                 finishListeningSegment()
                 updateListening()
@@ -161,11 +148,10 @@ class MeloPlaybackService : MediaSessionService() {
         } else ExoPlayer.PreloadConfiguration.DEFAULT
         player.addAnalyticsListener(PlaybackDiagnostics)
         player.addAnalyticsListener(AudioPipelineTracker(player).also { it.start() })
-        preloader = QueuePreloader(this, player, effectsScope, youtube.recent).also { it.start() }
+        preloader = QueuePreloader(this, player, effectsScope, server.recent).also { it.start() }
         recovery = PlaybackRecovery(this, player, effectsScope).also { it.start() }
         behavior = PlaybackBehavior(this, player).also { it.start() }
         discord = DiscordPresence(this, player, effectsScope).also { it.start() }
-        upgrader = LosslessUpgrader(this, player, effectsScope).also { it.start() }
         EqualizerRuntime.start(this, effectsScope)
         EqualizerRuntime.setAudioSessionId(player.audioSessionId)
         player.addListener(object : androidx.media3.common.Player.Listener {
@@ -265,7 +251,6 @@ class MeloPlaybackService : MediaSessionService() {
         preloader?.close(); preloader = null
         recovery?.close(); recovery = null
         discord?.close(); discord = null
-        upgrader?.close(); upgrader = null
         effectsScope.cancel()
         EqualizerRuntime.setAudioSessionId(0)
         AudioPipeline.reset()
@@ -273,21 +258,21 @@ class MeloPlaybackService : MediaSessionService() {
         super.onDestroy()
     }
 
-    internal class YouTubeChain(val recent: CacheDataSource.Factory, val kept: CacheDataSource.Factory)
+    internal class ServerCacheChain(val recent: CacheDataSource.Factory, val kept: CacheDataSource.Factory)
 
     internal companion object {
         /** Downloads first, then the recent cache, then the network. Nothing is written to downloads while listening. */
-        fun youTubeCacheChain(context: android.content.Context): YouTubeChain {
-            val youtube = YouTubeDataSource.Factory(context)
+        fun serverCacheChain(context: android.content.Context): ServerCacheChain {
+            val upstream = ServerAudioSource.factory(context)
             val flags = CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
             val recent = CacheDataSource.Factory().setCache(AudioCache.cache(context)).setCacheKeyFactory(AudioCache.keys)
-                .setUpstreamDataSourceFactory(youtube).setFlags(flags)
+                .setUpstreamDataSourceFactory(upstream).setFlags(flags)
             val recentReader = CacheDataSource.Factory().setCache(AudioCache.cache(context)).setCacheKeyFactory(AudioCache.keys)
-                .setUpstreamDataSourceFactory(youtube).setCacheWriteDataSinkFactory(null).setFlags(flags)
+                .setUpstreamDataSourceFactory(upstream).setCacheWriteDataSinkFactory(null).setFlags(flags)
             val recentPlayback = RecentAudioDataSourceFactory(context, recent, recentReader)
             val kept = CacheDataSource.Factory().setCache(DownloadCenter.cache(context)).setCacheKeyFactory(AudioCache.keys)
                 .setUpstreamDataSourceFactory(recentPlayback).setCacheWriteDataSinkFactory(null).setFlags(flags)
-            return YouTubeChain(recent, kept)
+            return ServerCacheChain(recent, kept)
         }
         private const val NEXT_TRACK_PRELOAD_US = 30_000_000L
         private const val SLEEP_FADE_MS = 8_000L

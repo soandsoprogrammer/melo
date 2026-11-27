@@ -15,7 +15,7 @@ internal suspend fun resolveSpotifyDeepLink(input: String): Music? {
         val shortUrl = candidate.toHttpUrlOrNull() ?: continue
         if (!shortUrl.isHttps || shortUrl.host !in SPOTIFY_SHORT_LINK_HOSTS) continue
         val destination = withContext(Dispatchers.IO) {
-            `in`.melo.data.youtube.YouTubeMusic.http.newCall(
+            `in`.melo.data.CatalogHttp.client.newCall(
                 Request.Builder().url(shortUrl).get().build(),
             ).execute().use { response -> response.request.url.toString() }
         }

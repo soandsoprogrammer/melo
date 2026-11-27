@@ -76,7 +76,6 @@ import `in`.melo.R
 import `in`.melo.MeloModel
 import `in`.melo.data.Music
 import `in`.melo.data.MusicKind
-import `in`.melo.data.isPodcastSearchContainer
 import `in`.melo.data.model.SearchFilterType
 import `in`.melo.data.model.Song
 import `in`.melo.data.model.toAlbum
@@ -110,7 +109,7 @@ fun SearchScreen(
     val ui = model.ui
     val discovery by model.discovery.collectAsStateWithLifecycle()
     val history by ui.searchHistory.collectAsStateWithLifecycle()
-    val visibleHistory = remember(history) { history.filterNot { it.isPodcastSearchContainer() } }
+    val visibleHistory = history
     val stable by ui.stablePlayerState.collectAsStateWithLifecycle()
     val navBarCompactMode by ui.navBarCompactMode.collectAsStateWithLifecycle()
     val saved by model.favorites.collectAsStateWithLifecycle()
@@ -121,10 +120,11 @@ fun SearchScreen(
     val statusBarTopInset = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
     val colorScheme = MaterialTheme.colorScheme
     val appSettings by ui.settings.collectAsStateWithLifecycle()
+    val server by model.serverLibrary.collectAsStateWithLifecycle()
     val showSources = appSettings.showSearchSources
     val searchSources = remember(discovery.spotifyEnabled, discovery.addonsEnabled) {
         SearchSource.entries.filter {
-            (it != SearchSource.Spotify || discovery.spotifyEnabled) && (it != SearchSource.Addons || discovery.addonsEnabled)
+            (it != SearchSource.Spotify || discovery.spotifyEnabled) && (it != SearchSource.MusicServer || server != null) && (it != SearchSource.Addons || discovery.addonsEnabled)
         }
     }
     val activeSourceIndex = searchSources.indexOf(discovery.activeSource).coerceAtLeast(0)
@@ -343,7 +343,7 @@ private val SOURCE_SEGMENT_MIN_WIDTH = 92.dp
 private fun SearchSource.labelRes(): Int = when (this) {
     SearchSource.All -> R.string.search_source_all
     SearchSource.Spotify -> R.string.search_source_spotify
-    SearchSource.YouTubeMusic -> R.string.search_source_youtube_short
+    SearchSource.MusicServer -> R.string.music_server_title
     SearchSource.Local -> R.string.search_source_device
     SearchSource.Addons -> R.string.search_source_addons
 }
@@ -351,7 +351,7 @@ private fun SearchSource.labelRes(): Int = when (this) {
 private fun SearchSource.iconRes(): Int = when (this) {
     SearchSource.All -> R.drawable.ic_melo_mark
     SearchSource.Spotify -> R.drawable.ic_source_spotify
-    SearchSource.YouTubeMusic -> R.drawable.ic_source_youtube_music
+    SearchSource.MusicServer -> R.drawable.rounded_library_music_24
     SearchSource.Local -> R.drawable.rounded_library_music_24
     SearchSource.Addons -> R.drawable.outline_high_quality_24
 }
@@ -360,7 +360,7 @@ private fun SearchSource.iconRes(): Int = when (this) {
 private fun SearchSource.tint(): Color = when (this) {
     SearchSource.All -> MaterialTheme.colorScheme.primary
     SearchSource.Spotify -> Color(0xFF1DB954)
-    SearchSource.YouTubeMusic -> Color(0xFFFF0033)
+    SearchSource.MusicServer -> MaterialTheme.colorScheme.secondary
     SearchSource.Local -> MaterialTheme.colorScheme.onSurfaceVariant
     SearchSource.Addons -> MaterialTheme.colorScheme.tertiary
 }

@@ -1,6 +1,9 @@
 package `in`.melo.playback
 
 import android.content.Context
+import `in`.melo.data.server.MusicServerException
+import `in`.melo.data.server.MusicServerFailure
+import `in`.melo.data.server.MusicServerUris
 import android.net.ConnectivityManager
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -31,13 +34,13 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-/** Reads the next queued tracks ahead into the recent cache, from YouTube Music. */
+/** Reads the next queued tracks ahead into the recent cache, from the music server. */
 @UnstableApi
 internal class QueuePreloader(
     context: Context,
     private val player: Player,
     private val scope: CoroutineScope,
-    private val youtubeSources: CacheDataSource.Factory,
+    private val serverSources: CacheDataSource.Factory,
 ) : Player.Listener, AutoCloseable {
     private val app = context.applicationContext
     private val index = AudioIndex.get(app)
@@ -95,30 +98,29 @@ internal class QueuePreloader(
             do {
                 val observed = revision
                 val s = settings.settings.value
-                // Add-on copies play in place of YouTube, so reading YouTube ahead would be wasted data.
-                if (!s.preloadUpcomingTracks || `in`.melo.data.addons.AddonResolver.directStreamActive()) return@launch
+                if (!s.preloadUpcomingTracks) return@launch
                 // A queue put back from the last session waits unprepared until Play; read nothing for it yet.
                 if (player.playbackState == Player.STATE_IDLE && !player.playWhenReady) return@launch
                 val current = player.currentMediaItemIndex
                 val items = if (current in 0 until player.mediaItemCount) {
                     preloadRange(current, player.mediaItemCount, s.preloadTracks).map { player.getMediaItemAt(it) }
                 } else emptyList()
-                fillYouTube(items.drop(1).filter { YouTubeUris.isYouTube(it.localConfiguration?.uri) }.take(MAX_YOUTUBE_AHEAD), s)
+                fillServer(items.drop(1).filter { MusicServerUris.isPlayback(it.localConfiguration?.uri) }.take(MAX_SERVER_AHEAD), s)
                 withContext(Dispatchers.IO) { index.flush() }
             } while (revision != observed && currentCoroutineContext().isActive)
         }
     }
 
-    /** The next YouTube Music tracks of the queue, read ahead into the recent cache. */
-    private suspend fun fillYouTube(items: List<MediaItem>, s: `in`.melo.data.preferences.AppSettings) {
+    /** The next server tracks of the queue, read ahead into the recent cache. */
+    private suspend fun fillServer(items: List<MediaItem>, s: `in`.melo.data.preferences.AppSettings) {
         for (item in items) {
             if (!NetworkMonitor.online.value || (!s.preloadOnMobile && connectivity.isActiveNetworkMetered)) return
             val uri = item.localConfiguration?.uri ?: continue
             val available = withContext(Dispatchers.IO) { AudioCache.isAvailableOffline(app, item.mediaId) }
             if (available) continue
-            val key = item.localConfiguration?.customCacheKey ?: YouTubeUris.cacheKey(item.mediaId)
+            val key = item.localConfiguration?.customCacheKey ?: AudioCache.key(MusicServerUris.fileKey(uri))
             val spec = DataSpec.Builder().setUri(uri).setKey(key).build()
-            val writer = CacheWriter(youtubeSources.createDataSourceForDownloading(), spec, null, null)
+            val writer = CacheWriter(serverSources.createDataSourceForDownloading(), spec, null, null)
             try { withContext(Dispatchers.IO) { runInterruptible { writer.cache() } } }
             catch (cancelled: CancellationException) { throw cancelled }
             catch (_: IOException) { /* Played from the network when its turn comes. */ }
@@ -135,8 +137,7 @@ internal class QueuePreloader(
 
     private companion object {
         const val SETTLE_MS = 1_000L
-        /** Read-ahead stays short: anonymous YouTube traffic is rate-limited. */
-        const val MAX_YOUTUBE_AHEAD = 2
+        const val MAX_SERVER_AHEAD = 2
     }
 }
 
@@ -186,7 +187,7 @@ internal class PlaybackRecovery(
         retry = scope.launch {
             for ((position, item) in targets) {
                 if (player.currentMediaItemIndex != current || NetworkMonitor.online.value) return@launch
-                if (YouTubeUris.isYouTube(item.localConfiguration?.uri) &&
+                if (MusicServerUris.isPlayback(item.localConfiguration?.uri) &&
                     !withContext(Dispatchers.IO) { AudioCache.isAvailableOffline(app, item.mediaId) }) continue
                 if (player.currentMediaItemIndex != current || player.playerError == null || !player.playWhenReady) return@launch
                 player.seekToDefaultPosition(position)
@@ -218,10 +219,9 @@ internal class PlaybackRecovery(
 @UnstableApi
 internal class ResilientLoadPolicy : DefaultLoadErrorHandlingPolicy() {
     override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
-        // A track YouTube Music does not have, or refuses to every client, will not appear by retrying.
-        val youtube = generateSequence<Throwable>(loadErrorInfo.exception) { it.cause }.take(8)
-            .filterIsInstance<`in`.melo.data.youtube.YouTubeFailure>().firstOrNull()
-        if (youtube != null && youtube.status in PERMANENT_YOUTUBE_FAILURES) return C.TIME_UNSET
+        val failure = generateSequence<Throwable>(loadErrorInfo.exception) { it.cause }.take(8)
+            .filterIsInstance<MusicServerException>().firstOrNull()?.failure
+        if (failure == MusicServerFailure.NoMatch || failure == MusicServerFailure.Credentials) return C.TIME_UNSET
         val base = super.getRetryDelayMsFor(loadErrorInfo)
         return if (base == C.TIME_UNSET) base else minOf(base, MAX_RETRY_DELAY_MS)
     }
@@ -231,7 +231,6 @@ internal class ResilientLoadPolicy : DefaultLoadErrorHandlingPolicy() {
         const val MAX_RETRY_DELAY_MS = 2_000L
         const val ONLINE_RETRIES = 6
         const val OFFLINE_RETRIES = 1
-        val PERMANENT_YOUTUBE_FAILURES = setOf("NO_MATCH", "NO_AUDIO_FORMAT", "ALL_CLIENTS_EXCLUDED", "UNPLAYABLE", "ERROR", "LOGIN_REQUIRED")
     }
 }
 

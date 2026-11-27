@@ -453,9 +453,6 @@
     <string name="settings_downloads_clear_text">将从此设备删除 %1$d 首曲目（%2$s），之后仍可重新下载。</string>
     <string name="settings_downloads_clear_action">移除</string>
     <string name="settings_logout_confirm">退出 Spotify 登录？</string>
-    <string name="google_disconnect_confirm">断开 Google 账号？</string>
-    <string name="google_disconnect_action">断开连接</string>
-    <string name="settings_youtube_account_refresh">YouTube Music · 点按刷新曲库</string>
     <string name="settings_logout_spotify">退出 Spotify 登录</string>
     <string name="settings_app_style_title">应用样式</string>
     <string name="settings_app_style_subtitle">设置导航栏、菜单和卡片的材质。</string>
@@ -503,7 +500,7 @@
     <string name="onboarding_history_title">播放记录</string>
     <string name="onboarding_history_body">播放记录按时间倒序显示。有新版本时，这里会显示更新箭头。</string>
     <string name="onboarding_profile_title">账号与设置</string>
-    <string name="onboarding_profile_body">在个人资料中连接 Spotify 和 YouTube Music，或打开设置。</string>
+    <string name="onboarding_profile_body">在个人资料中连接 Spotify 和 音乐服务器，或打开设置。</string>
     <string name="onboarding_library_title">你的曲库</string>
     <string name="onboarding_library_body">歌单、专辑、歌手、下载和手机里的音乐都集中在这里。</string>
     <string name="onboarding_finish_title">准备就绪</string>

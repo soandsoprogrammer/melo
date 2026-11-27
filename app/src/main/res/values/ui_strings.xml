@@ -472,9 +472,6 @@
     <string name="settings_downloads_clear_text">%1$d tracks (%2$s) will be deleted from this device. You can download them again later.</string>
     <string name="settings_downloads_clear_action">Remove</string>
     <string name="settings_logout_confirm">Sign out of Spotify?</string>
-    <string name="google_disconnect_confirm">Disconnect the Google account?</string>
-    <string name="google_disconnect_action">Disconnect</string>
-    <string name="settings_youtube_account_refresh">YouTube Music · Tap to refresh the library</string>
     <string name="settings_logout_spotify">Sign out of Spotify</string>
     <string name="settings_app_style_title">App style</string>
     <string name="settings_app_style_subtitle">The material of bars, menus and cards.</string>
@@ -522,7 +519,7 @@
     <string name="onboarding_history_title">Listening history</string>
     <string name="onboarding_history_body">Everything you’ve played, newest first. When a new version of Melo is out, an update arrow takes this spot.</string>
     <string name="onboarding_profile_title">Accounts and settings</string>
-    <string name="onboarding_profile_body">Your profile is where you connect Spotify and YouTube Music, and where Settings live.</string>
+    <string name="onboarding_profile_body">Your profile is where you connect Spotify and music server, and where Settings live.</string>
     <string name="onboarding_library_title">Your Library</string>
     <string name="onboarding_library_body">Your playlists, albums, artists, downloads and the music on this phone, all in one place.</string>
     <string name="onboarding_finish_title">You’re all set</string>

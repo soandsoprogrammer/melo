@@ -20,9 +20,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import `in`.melo.presentation.components.MeloBottomSheet as ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -43,14 +41,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import `in`.melo.R
 import `in`.melo.MeloModel
 import `in`.melo.data.Music
+import `in`.melo.data.PlaylistKind
+import `in`.melo.data.server.MusicServer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import `in`.melo.ui.theme.MeloLayout
 
 /**
- * Searches tracks and adds them to [playlist]. A Spotify playlist takes Spotify tracks and local
- * files; a multi-service playlist also takes YouTube Music tracks.
+ * Browses or searches music that can be added to [playlist].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,29 +62,38 @@ fun AddTracksSheet(
     onDismiss: () -> Unit,
 ) {
     val discovery by model.discovery.collectAsStateWithLifecycle()
-    // A Spotify playlist takes Spotify tracks and local files, a YouTube Music playlist only YouTube Music tracks.
-    val remote = target != `in`.melo.data.PlaylistKind.MultiService
+    val serverLibrary by model.serverLibrary.collectAsStateWithLifecycle()
+    val remote = target != PlaylistKind.MultiService
     val sources = buildList {
-        if (discovery.spotifyEnabled && target != `in`.melo.data.PlaylistKind.YouTubeMusic) add(MeloModel.TRACKS_SPOTIFY to R.string.search_source_spotify)
-        if (target != `in`.melo.data.PlaylistKind.Spotify) add(MeloModel.TRACKS_YOUTUBE to R.string.search_source_youtube)
-        if (target != `in`.melo.data.PlaylistKind.YouTubeMusic) add(MeloModel.TRACKS_FILES to R.string.library_tab_local)
+        if (serverLibrary != null && target != PlaylistKind.Spotify) add(MeloModel.TRACKS_SERVER to R.string.music_server_title)
+        if (discovery.spotifyEnabled && target != PlaylistKind.MusicServer) add(MeloModel.TRACKS_SPOTIFY to R.string.search_source_spotify)
+        if (target != PlaylistKind.MusicServer) add(MeloModel.TRACKS_FILES to R.string.library_tab_local)
     }
-    var source by remember { mutableStateOf(sources.first().first) }
+    var selectedSource by remember { mutableStateOf<String?>(null) }
+    val source = sources.firstOrNull { it.first == selectedSource }?.first ?: sources.firstOrNull()?.first
     var query by remember { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<Music>>(emptyList()) }
-    var loading by remember { mutableStateOf(false) }
+    var results by remember(query, source, serverLibrary) { mutableStateOf<List<Music>>(emptyList()) }
+    var loading by remember(query, source, serverLibrary) { mutableStateOf(false) }
+    var offset by remember(query, source, serverLibrary) { mutableStateOf(0) }
+    var more by remember(query, source, serverLibrary) { mutableStateOf(false) }
+    var error by remember(query, source, serverLibrary) { mutableStateOf(false) }
     var added by remember { mutableStateOf<Set<String>>(emptySet()) }
     var adding by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val failed = stringResource(R.string.playlist_add_failed)
-    LaunchedEffect(query, source) {
-        if (query.trim().length < 2) { results = emptyList(); return@LaunchedEffect }
-        delay(350)
+    LaunchedEffect(query, source, serverLibrary, offset) {
+        if (source == null || (query.isBlank() && source == MeloModel.TRACKS_SPOTIFY)) return@LaunchedEffect
         loading = true
-        results = try { model.searchTracks(query, source) }
+        error = false
+        if (offset == 0 && query.isNotBlank()) delay(300)
+        try {
+            val page = model.searchTracks(query, source, offset)
+            results = if (offset == 0) page else (results + page).distinctBy(Music::id)
+            more = source == MeloModel.TRACKS_SERVER && page.size == MusicServer.PAGE_SIZE
+        }
         catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) { emptyList() }
-        loading = false
+        catch (_: Exception) { error = true }
+        finally { loading = false }
     }
     `in`.melo.presentation.components.MeloBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(MeloLayout.Space3)) {
@@ -99,9 +107,10 @@ fun AddTracksSheet(
             if (sources.size > 1) MeloSegmentedControl(
                 options = sources.map { stringResource(it.second) },
                 selectedIndex = sources.indexOfFirst { it.first == source },
-                onSelect = { source = sources[it].first },
+                onSelect = { selectedSource = sources[it].first },
             )
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+            if (error) Text(stringResource(R.string.search_request_interrupted), color = MaterialTheme.colorScheme.error)
             LazyColumn(Modifier.fillMaxWidth().heightIn(min = 240.dp, max = 520.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 items(results, key = { it.id }) { track ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -134,6 +143,11 @@ fun AddTracksSheet(
                                 }
                             },
                         ) { Icon(if (done) MeloIcons.Check else MeloIcons.Add, stringResource(R.string.playlist_add_tracks)) }
+                    }
+                }
+                if (more) item {
+                    TextButton(onClick = { offset += MusicServer.PAGE_SIZE }, enabled = !loading && !error) {
+                        Text(stringResource(R.string.music_server_more))
                     }
                 }
             }

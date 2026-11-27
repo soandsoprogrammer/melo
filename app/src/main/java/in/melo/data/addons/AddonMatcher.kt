@@ -35,7 +35,7 @@ internal object AddonMatcher {
         parseTitle(title, artist).let { (it.words + it.versions).joinToString(" ") }
     internal fun primaryArtist(artist: String): String {
         val primary = normalize(artist).split(ARTIST_SEPARATORS).firstOrNull()?.trim().orEmpty()
-        return primary.takeUnless { it in YOUTUBE_TYPE_LABELS }.orEmpty()
+        return primary.takeUnless { it in GENERIC_CATALOG_LABELS }.orEmpty()
     }
     fun sharesArtist(wanted: String, got: String): Boolean {
         val want = artistNames(wanted)
@@ -428,7 +428,7 @@ internal object AddonMatcher {
         "studioversion", "fullversion", "standardversion", "explicitversion",
         "deluxeversion", "originaltrack",
     )
-    private val YOUTUBE_TYPE_LABELS = setOf(
+    private val GENERIC_CATALOG_LABELS = setOf(
         "música", "musica", "vídeo", "video", "song", "album", "álbum", "artista", "artist",
     )
     private val NOISE_WORDS = setOf(

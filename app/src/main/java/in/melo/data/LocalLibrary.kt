@@ -55,7 +55,7 @@ internal fun matchLocalFile(reference: Music, files: List<Music>): Music? = Loca
 /** The device's files by normalized title, built once per file list: matching a playlist then costs one lookup per entry. */
 internal class LocalFileIndex(val files: List<Music>) {
     private class Entry(val file: Music, val artist: String)
-    private val normalize = `in`.melo.data.youtube.TrackMatcher::normalize
+    private val normalize = `in`.melo.data.TrackMatcher::normalize
     private val byTitle: Map<String, List<Entry>> = files.groupBy({ normalize(it.title) }) { Entry(it, normalize(it.subtitle)) }
 
     fun match(reference: Music): Music? {
@@ -126,7 +126,7 @@ class LocalLibrary(context: Context) {
     }
 }
 
-/** A multi-service playlist: stored on this device, it can hold Spotify, YouTube Music and local tracks. */
+/** A multi-service playlist: stored on this device, it can hold server tracks and other supported sources. */
 data class LocalPlaylist(val id: String, val name: String, val tracks: List<Music>, val cover: String? = null) {
     fun asMusic(): Music = Music(
         id = id, title = name, kind = MusicKind.Playlist,

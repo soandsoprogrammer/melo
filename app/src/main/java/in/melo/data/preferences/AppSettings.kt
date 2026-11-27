@@ -27,11 +27,11 @@ data class AppSettings(
     val albumCoverMix: Boolean = true,
     /** Album and playlist pages show the whole cover as a full-width square instead of a cropped banner. */
     val fullScreenDetailCover: Boolean = false,
-    /** Plays a queued track from the first add-on holding the same recording, instead of YouTube Music. */
+    /** Plays a queued track from the first add-on holding the same recording, as an alternative source. */
     val directSourceStream: Boolean = false,
     /** How far, in seconds, an add-on copy's length may differ from the queued track's and still count as it. */
     val addonLengthToleranceSec: Int = 5,
-    /** While a track plays YouTube Music's copy, looks for a lossless add-on copy and switches to it in place. */
+    /** While a track plays the music server's copy, looks for a lossless add-on copy and switches to it in place. */
     val losslessUpgrade: Boolean = true,
     /** How the cover's colours are drawn behind the player: [BACKDROP_BLEND] or [BACKDROP_MESH]. */
     val playerBackdropStyle: String = BACKDROP_BLEND,
@@ -69,8 +69,8 @@ data class AppSettings(
     val compactLists: Boolean = false,
     /** Home shelves: order, visibility, layout and size, as [HomeLayout] encodes them. Empty: defaults. */
     val homeShelves: String = "",
-    /** Source after pins on the Home Speed Dial: YouTube Music, Spotify, or combined listening history. */
-    val homeDialSource: String = DIAL_SOURCE_YOUTUBE,
+    /** Source after pins on the Home Speed Dial: the music server, Spotify, or combined listening history. */
+    val homeDialSource: String = DIAL_SOURCE_SERVER,
     /** Visible tile rows per Speed Dial page. */
     val homeDialRows: Int = 4,
     /** Whether the home Speed Dial is shown. */
@@ -102,13 +102,13 @@ data class AppSettings(
     val streamingQualityWifi: String = "lossless",
     val streamingQualityMobile: String = "high",
     val downloadQuality: String = "very_high",
-    /** Loudness normalization of Spotify and YouTube Music tracks from the loudness each service publishes. */
+    /** Loudness normalization of Spotify and the music server tracks from the loudness each service publishes. */
     val audioNormalization: Boolean = false,
     /** The ⋮ button at the top right of the full player. */
     val showPlayerMenuButton: Boolean = true,
     /** Horizontal swipe on the mini player: [MINI_SWIPE_TRACKS], [MINI_SWIPE_DISMISS] or [MINI_SWIPE_OFF]. */
     val miniPlayerSwipe: String = MINI_SWIPE_TRACKS,
-    /** The Spotify / YouTube / Device choice above search results. Hidden: every search reads all sources. */
+    /** The Spotify / Music Server / Device choice above search results. Hidden: every search reads all sources. */
     val showSearchSources: Boolean = false,
     /** Firebase usage analytics; off until the user agrees on the first-run screen, and changeable in Privacy settings. */
     val analyticsEnabled: Boolean = false,
@@ -209,9 +209,8 @@ data class AppSettings(
         const val MINI_SWIPE_TRACKS = "tracks"
         const val MINI_SWIPE_DISMISS = "dismiss"
         const val MINI_SWIPE_OFF = "off"
-        const val YOUTUBE_COUNTRY_IN = "IN"
         const val DIAL_SOURCE_HISTORY = "history"
-        const val DIAL_SOURCE_YOUTUBE = "youtube"
+        const val DIAL_SOURCE_SERVER = "server"
         const val DIAL_SOURCE_SPOTIFY = "spotify"
         const val BACKDROP_BLEND = "blend"
         const val BACKDROP_MESH = "mesh"
@@ -277,7 +276,7 @@ data class AppSettings(
                 compactLists = json.optBoolean("compactLists", d.compactLists),
                 homeShelves = json.optString("homeShelves", d.homeShelves),
                 homeDialSource = json.optString("homeDialSource", d.homeDialSource)
-                    .takeIf { it in setOf(DIAL_SOURCE_HISTORY, DIAL_SOURCE_YOUTUBE, DIAL_SOURCE_SPOTIFY) }
+                    .takeIf { it in setOf(DIAL_SOURCE_HISTORY, DIAL_SOURCE_SERVER, DIAL_SOURCE_SPOTIFY) }
                     ?: d.homeDialSource,
                 homeDialRows = json.optInt("homeDialRows", d.homeDialRows).coerceIn(3, 4),
                 homeSpeedDialEnabled = json.optBoolean("homeSpeedDialEnabled", d.homeSpeedDialEnabled),

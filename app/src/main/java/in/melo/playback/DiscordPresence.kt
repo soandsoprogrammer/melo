@@ -13,7 +13,6 @@ import `in`.melo.data.discord.DiscordTrack
 import `in`.melo.data.isLocalTrackId
 import `in`.melo.data.preferences.AppSettings
 import `in`.melo.data.preferences.SettingsStore
-import `in`.melo.data.youtube.TrackMatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -181,13 +180,12 @@ internal class DiscordPresence(
     private fun MediaItem.toDiscordTrack(): DiscordTrack? {
         val meta = mediaMetadata
         val title = meta.title?.toString()?.takeIf { it.isNotBlank() } ?: return null
-        val videoId = discordVideoId(mediaId, localConfiguration?.uri)
         return DiscordTrack(
             title = title,
             artist = meta.artist?.toString().orEmpty(),
             album = meta.extras?.getString("album").orEmpty(),
             artworkUrl = meta.artworkUri?.toString(),
-            videoId = videoId,
+            trackId = mediaId.takeIf { it.startsWith("spotify:track:") },
         )
     }
 
@@ -210,13 +208,4 @@ internal class DiscordPresence(
         const val TAG = "MeloDiscord"
         const val TEARDOWN_TIMEOUT_MS = 2_000L
     }
-}
-
-/** The YouTube Music video a track plays from, or null for a device file or an unmatched track. */
-internal fun discordVideoId(mediaId: String, uri: android.net.Uri?): String? = when {
-    isLocalTrackId(mediaId) -> null
-    uri == null || !YouTubeUris.isYouTube(uri) -> null
-    uri.authority == "track" -> uri.lastPathSegment
-    uri.authority == "match" -> uri.lastPathSegment?.let(TrackMatcher::known)
-    else -> null
 }

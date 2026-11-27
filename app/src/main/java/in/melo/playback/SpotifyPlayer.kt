@@ -17,7 +17,10 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import `in`.melo.data.Music
 import `in`.melo.data.MusicKind
-import `in`.melo.data.youtube.YouTubeFailure
+import `in`.melo.data.server.MusicServer
+import `in`.melo.data.server.MusicServerException
+import `in`.melo.data.server.MusicServerFailure
+import `in`.melo.data.server.MusicServerUris
 import `in`.melo.data.isLocalTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -433,10 +436,10 @@ class SpotifyPlayer(context: Context, scope: CoroutineScope) : AutoCloseable {
         val contextTailId = after.lastOrNull()?.id ?: queue.lastOrNull()?.id
         val error = player.playerError?.let { failure ->
             val notFound = generateSequence<Throwable>(failure) { it.cause }.take(12)
-                .filterIsInstance<YouTubeFailure>().any { it.status == "NO_MATCH" }
+                .filterIsInstance<MusicServerException>().any { it.failure == MusicServerFailure.NoMatch }
             val message = when {
                 !`in`.melo.data.NetworkMonitor.online.value -> R.string.playback_error_offline
-                notFound -> R.string.playback_error_youtube_match
+                notFound -> R.string.music_server_no_match
                 else -> playbackErrorResource(failure.errorCode)
             }
             AppLocales.wrap(appContext).getString(message)
@@ -474,21 +477,8 @@ class SpotifyPlayer(context: Context, scope: CoroutineScope) : AutoCloseable {
             LastQueue.saveProgress(appContext, current, position)
         }
     }
-    private var ceilingAt = 0L
-    private var ceilingNow: Long? = null
-    /** The bitrate cap of the quality chosen for the connection in use, read at most once a second. */
-    private fun ceiling(): Long? {
-        val now = android.os.SystemClock.elapsedRealtime()
-        if (ceilingAt == 0L || now - ceilingAt > 1_000) {
-            ceilingAt = now
-            ceilingNow = `in`.melo.data.AudioQuality.current(
-                appContext, `in`.melo.data.preferences.SettingsStore.get(appContext).settings.value,
-            ).ceiling
-        }
-        return ceilingNow
-    }
-    /** The media item for [track] at the quality chosen for the connection in use. */
-    private fun mediaItem(track: Music, queued: Boolean = false): MediaItem = mediaItem(track, queued, ceiling())
+    private fun mediaItem(track: Music, queued: Boolean = false): MediaItem =
+        mediaItem(track, queued, MusicServer.get(appContext).library.value)
     private companion object {
         const val WINDOW_BEHIND = 20
         const val WINDOW_AHEAD = 100
@@ -531,7 +521,7 @@ internal fun playbackErrorResource(code: Int): Int = when (code) {
     else -> R.string.playback_error_generic
 }
 private fun Music.isPlayableTrack(): Boolean = kind == MusicKind.Track &&
-    (id.startsWith("spotify:track:") || id.startsWith(`in`.melo.data.youtube.YTM_TRACK_PREFIX) ||
+    (id.startsWith("spotify:track:") ||
         `in`.melo.data.addons.AddonUris.isAddonTrack(id) ||
         `in`.melo.data.server.MusicServerUris.isTrack(id) || (isLocalTrack && mediaUri != null))
 
@@ -540,12 +530,11 @@ private const val QUEUED = "queued"
 private fun MediaItem.isQueued(): Boolean = mediaMetadata.extras?.getBoolean(QUEUED) == true
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-private fun mediaItem(track: Music, queued: Boolean, ceiling: Long?): MediaItem {
-    // YouTube Music tracks and Spotify tracks are both read from YouTube Music; add-on rows and device files play directly.
-    val youtube = YouTubeUris.of(track)?.let { YouTubeUris.withCeiling(it, ceiling) }
+private fun mediaItem(track: Music, queued: Boolean, library: String?): MediaItem {
+    val server = MusicServerUris.playback(track, library)
     return MediaItem.Builder().setMediaId(track.id)
-        .setUri(youtube ?: `in`.melo.data.server.MusicServerUris.stream(track.id) ?: `in`.melo.data.addons.AddonUris.uriOf(track.id) ?: track.mediaUri?.let(Uri::parse) ?: Uri.parse(track.id))
-        .apply { if (youtube != null) setCustomCacheKey(YouTubeUris.cacheKey(track.id, ceiling)) }
+        .setUri(server ?: `in`.melo.data.addons.AddonUris.uriOf(track.id) ?: track.mediaUri?.let(Uri::parse) ?: Uri.parse(track.id))
+        .apply { if (server != null) setCustomCacheKey(AudioCache.key(MusicServerUris.fileKey(server))) }
         .setMediaMetadata(MediaMetadata.Builder().setTitle(track.title).setArtist(track.subtitle)
             .setArtworkUri(`in`.melo.data.largestSpotifyImage(track.imageUrl)?.let(Uri::parse)).setIsPlayable(true).setIsBrowsable(false)
             .setExtras(Bundle().apply {

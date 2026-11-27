@@ -525,15 +525,6 @@ private fun HomeAccountMenuOverlay(
                         // One row shape for the accounts and the actions alike, as an iOS menu:
                         // the same height, the same leading slot and the same text inset.
                         AccountMenuRow(
-                            title = stringResource(R.string.search_source_youtube),
-                            detail = profileName?.let { name ->
-                                val handle = profileHandle?.takeIf(String::isNotBlank)
-                                if (handle == null) name else "$name · $handle"
-                            } ?: stringResource(if (profileName != null) R.string.home_account_connected else R.string.home_account_not_connected),
-                            leading = { AccountServiceMark(profileImageUrl.takeIf { profileName != null }, R.drawable.ic_source_youtube_music) },
-                            onClick = onManageAccountsClick,
-                        )
-                        AccountMenuRow(
                             title = stringResource(R.string.search_source_spotify),
                             detail = spotifyProfile?.displayName?.takeIf(String::isNotBlank)
                                 ?: stringResource(if (spotifyConnected) R.string.home_account_connected else R.string.home_account_not_connected),

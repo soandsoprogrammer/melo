@@ -20,4 +20,6 @@
     <string name="music_server_error_credentials">Vérifiez votre nom d’utilisateur et votre mot de passe.</string>
     <string name="music_server_error_connection">Serveur inaccessible. Vérifiez l’adresse et votre connexion.</string>
     <string name="music_server_error_response">Le serveur n’a pas pu traiter la demande.</string>
+    <string name="music_server_delete_playlist">Supprimer « %1$s » de votre serveur de musique ?</string>
+    <string name="music_server_no_match">Ce titre est introuvable sur votre serveur de musique.</string>
 </resources>

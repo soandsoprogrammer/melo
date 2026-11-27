@@ -111,7 +111,7 @@ fun AlbumDetailScreen(
             // Play loads the tracks itself, so it waits only on an album that came back empty.
             DetailPlayRow(onPlay = { ui.playItem(current) }, onShuffle = { ui.shuffleItem(current) },
                 enabled = detail?.content == null || songs.isNotEmpty())
-            // YouTube Music albums cannot be saved to Spotify or seed a Spotify radio.
+            // Server albums cannot be saved to Spotify or seed a Spotify radio.
             val spotifyAlbum = current.source == `in`.melo.data.MusicSource.Spotify
             DetailActionsRow(current, spotifyAlbum, current.id in saved, pins.any { it.id == current.id },
                 { model.toggleFavorite(current) }, { ui.togglePin(current) },

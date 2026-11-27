@@ -265,11 +265,7 @@ internal fun DiscordSettings(model: MeloModel, navController: NavHostController)
                 artist = it.displayArtist,
                 album = it.album,
                 artworkUrl = it.albumArtUriString,
-                videoId = when {
-                    it.id.startsWith("ytm:track:") -> it.id.removePrefix("ytm:track:")
-                    it.id.startsWith("spotify:track:") -> `in`.melo.data.youtube.TrackMatcher.known(it.id)
-                    else -> null
-                },
+                trackId = it.id.takeIf { id -> id.startsWith("spotify:track:") },
             )
         }
         SettingsSection(

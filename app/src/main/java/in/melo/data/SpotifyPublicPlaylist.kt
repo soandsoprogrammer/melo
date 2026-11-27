@@ -1,6 +1,5 @@
 package `in`.melo.data
 
-import `in`.melo.data.youtube.YouTubeMusic
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import org.json.JSONObject
@@ -26,7 +25,7 @@ internal object SpotifyPublicPlaylist {
 
     fun read(id: String): Content = readEntity("playlist", id)
 
-    /** Public embed metadata is also enough to match a shared Spotify track in YouTube Music. */
+    /** Public embed metadata is also enough to match a shared Spotify track on the music server. */
     fun readTrack(id: String): Music? = readEntity("track", id).tracks.firstOrNull()
 
     fun readEntity(kind: String, id: String): Content {
@@ -35,7 +34,7 @@ internal object SpotifyPublicPlaylist {
         val request = Request.Builder().url("https://open.spotify.com/embed/$kind/$id")
             .header("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
             .build()
-        val html = YouTubeMusic.http.newCall(request).execute().use { response ->
+        val html = `in`.melo.data.CatalogHttp.client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Spotify answered ${response.code}.")
             response.body?.string().orEmpty()
         }

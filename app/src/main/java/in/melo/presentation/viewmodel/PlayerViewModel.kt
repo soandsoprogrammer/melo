@@ -249,13 +249,9 @@ class PlayerViewModel(val model: MeloModel, private val scope: CoroutineScope) {
     private val mutableSlice = MutableStateFlow(FullPlayerSlice())
     val fullPlayerSlice: StateFlow<FullPlayerSlice> =
         combine(
-            mutableSlice, model.player.state.map { it.audioFormat to it.track?.id }.distinctUntilChanged(), settings,
-            `in`.melo.playback.LosslessUpgrade.searching,
-        ) { slice, (format, id), s, searching ->
-            slice.copy(
-                audioMetaText = format.takeIf { s.showPlayerFileInfo && it.isNotBlank() },
-                qualityUpgrading = s.showPlayerFileInfo && id != null && searching == id,
-            )
+            mutableSlice, model.player.state.map { it.audioFormat }.distinctUntilChanged(), settings,
+        ) { slice, format, s ->
+            slice.copy(audioMetaText = format.takeIf { s.showPlayerFileInfo && it.isNotBlank() })
         }.distinctUntilChanged().stateIn(scope, SharingStarted.Eagerly, FullPlayerSlice())
 
     /** Formats measured while a Spotify track played: the only quality this app can state for it. */
@@ -562,19 +558,14 @@ class PlayerViewModel(val model: MeloModel, private val scope: CoroutineScope) {
     private val mutableDownloadPreparations = MutableStateFlow<Set<String>>(emptySet())
     val downloadPreparations = mutableDownloadPreparations.asStateFlow()
 
-    /** Keeps the Spotify tracks of [item] on this device, stored as delivered: encrypted. */
+    /** Downloads the original server audio for [item]. */
     fun downloadItem(item: Music) {
         if (item.id in downloadJobs) return
         val job = scope.launch(start = kotlinx.coroutines.CoroutineStart.LAZY) {
             try {
-                val all = model.tracksOf(item).filterNot(Music::isLocalTrack)
-                if (all.isEmpty()) { sendToast(context.getString(R.string.no_tracks_for, item.title)); return@launch }
-                // Spotify keeps its own files only for accounts allowed to; YouTube Music files are always kept.
-                val throughSpotify = `in`.melo.data.SpotifyAccount.signedIn && all.any { it.id.startsWith("spotify:track:") }
-                val allowed = !throughSpotify || model.offlineAllowed()
-                kotlinx.coroutines.currentCoroutineContext().ensureActive()
-                val tracks = if (allowed) all else all.filter { it.source == `in`.melo.data.MusicSource.YouTubeMusic }
-                if (tracks.isEmpty()) { sendToast(context.getString(R.string.download_not_allowed)); return@launch }
+                val server = `in`.melo.data.server.MusicServer.get(context)
+                val tracks = model.tracksOf(item).filter { `in`.melo.data.server.MusicServerUris.playback(it, server.library.value) != null }
+                if (tracks.isEmpty()) { sendToast(context.getString(R.string.no_tracks_for, item.title)); return@launch }
                 DownloadCenter.enqueue(context, item, tracks) {
                     sendToast(context.getString(R.string.download_failed, item.title))
                 }

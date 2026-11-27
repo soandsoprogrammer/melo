@@ -72,7 +72,7 @@ class MusicServerPlaybackSignalTest {
                     ): AudioSink = DefaultAudioSink.Builder(context).setAudioProcessors(arrayOf(SignalProbe())).build()
                 }
                 val local = ProgressiveMediaSource.Factory(DefaultDataSource.Factory(app))
-                player = ExoPlayer.Builder(app, renderers).setMediaSourceFactory(MeloMediaSourceFactory(app, local, local))
+                player = ExoPlayer.Builder(app, renderers).setMediaSourceFactory(MeloMediaSourceFactory(local, ProgressiveMediaSource.Factory(MeloPlaybackService.serverCacheChain(app).kept)))
                     .build().apply {
                         addAnalyticsListener(PlaybackDiagnostics)
                         setMediaItems(listOf(first, second).map { track ->

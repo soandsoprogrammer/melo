@@ -28,10 +28,8 @@ internal object PlaybackDiagnostics : AnalyticsListener {
         lastError = "$kind:${(error as? PlaybackException)?.errorCodeName.orEmpty()}:${causes.joinToString(">") { it.javaClass.simpleName }}:http=${status ?: 0}"
         Log.w("MeloAudio", lastError!!)
         // Messages are Melo's own for these types; others may carry addresses.
-        val reason = causes.lastOrNull { it is `in`.melo.data.SpotifyFailure || it is `in`.melo.data.youtube.YouTubeFailure }?.let { cause ->
-            val status = (cause as? `in`.melo.data.youtube.YouTubeFailure)?.status
-            cause.message?.take(MAX_REASON)?.let { if (status != null) "$it ($status)" else it }
-        }
+        val reason = causes.lastOrNull { it is `in`.melo.data.SpotifyFailure || it is `in`.melo.data.server.MusicServerException }
+            ?.message?.take(MAX_REASON)
         `in`.melo.data.diagnostics.DiagnosticLog.record("player", lastError + (reason?.let { " \"$it\"" } ?: ""))
     }
     override fun onPlayerError(eventTime: AnalyticsListener.EventTime, error: PlaybackException) = failure("player", error)

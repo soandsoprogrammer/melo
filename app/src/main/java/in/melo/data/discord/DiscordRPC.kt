@@ -13,8 +13,8 @@ data class DiscordTrack(
     val album: String,
     /** Cover art; Discord can only show an http(s) URL. */
     val artworkUrl: String?,
-    /** The YouTube Music video the track plays from, when known. */
-    val videoId: String?,
+    /** A publicly shareable Spotify track ID, when available. */
+    val trackId: String?,
 )
 
 /**
@@ -30,7 +30,7 @@ data class DiscordTrack(
  *   |art |  Artist                 <- state
  *   +----+  Hi-Res Lossless · FLAC · 24-bit · 96 kHz
  *           ------ 1:04 / 3:47     <- from the timestamps
- *   [ Listen on YouTube Music ]    <- button 1
+ *   [ Listen on Spotify ]    <- button 1
  *   [ Visit Melo              ]    <- button 2
  * ```
  */
@@ -129,11 +129,11 @@ class DiscordRPC(
 
     companion object {
         const val PROJECT_URL = "https://github.com/aarush-io/melo"
-        const val DEFAULT_BUTTON_1 = "Listen on YouTube Music"
+        const val DEFAULT_BUTTON_1 = "Listen on Spotify"
         const val DEFAULT_BUTTON_2 = "Visit Melo"
 
         fun watchUrl(track: DiscordTrack): String? =
-            track.videoId?.let { "https://music.youtube.com/watch?v=$it" }
+            track.trackId?.let { "https://open.spotify.com/track/" + it.removePrefix("spotify:track:") }
 
         /** Replaces {song_name}, {artist_name} and {album_name}. */
         fun resolveVariables(text: String, track: DiscordTrack): String = text

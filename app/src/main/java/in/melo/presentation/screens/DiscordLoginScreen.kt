@@ -108,7 +108,7 @@ private fun isSignedIn(url: String?): Boolean =
  * the only credential that can.
  *
  * Unlike the Google sign-in, this keeps the WebView's cookies: clearing them
- * would sign the YouTube Music account out.
+ * could discard other WebView sessions.
  */
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)

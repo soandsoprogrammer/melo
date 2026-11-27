@@ -6,7 +6,7 @@ import `in`.melo.data.preferences.AppSettings
 
 /**
  * How good the stream may be, chosen separately for Wi-Fi and for mobile data. The lower rungs cap
- * the YouTube Music format that is picked; High takes the best one offered; Lossless adds the switch
+ * the the audio provider format that is picked; High takes the best one offered; Lossless adds the switch
  * to an add-on's bit-exact copy of the same recording when one is found.
  */
 enum class AudioQuality(val key: String) {
@@ -14,12 +14,12 @@ enum class AudioQuality(val key: String) {
     LOW("low"),
     /** Up to about 128 kbit/s. */
     NORMAL("normal"),
-    /** The best stream YouTube Music offers. */
+    /** The best stream the audio provider offers. */
     HIGH("high"),
     /** High, upgraded to an add-on's lossless copy while it plays. */
     LOSSLESS("lossless");
 
-    /** The highest bitrate a YouTube Music format may have at this rung, or null for no limit. */
+    /** The highest bitrate a the audio provider format may have at this rung, or null for no limit. */
     val ceiling: Long? get() = when (this) {
         LOW -> 72_000L
         NORMAL -> 136_000L

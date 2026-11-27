@@ -5,29 +5,23 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.ForwardingAudioSink
 import `in`.melo.data.AudioIndex
-import `in`.melo.data.youtube.YTM_TRACK_PREFIX
 import java.nio.ByteBuffer
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.math.pow
 
 /**
  * Loudness of tracks as their service publishes it. Spotify gives each file's integrated loudness
- * and true peak (AUDIO_FILES extension, kept in [AudioIndex]); YouTube Music gives `loudnessDb`,
- * the difference from its own reference, in the player response.
+ * and true peak, which are kept in [AudioIndex].
  */
 object TrackLoudness {
-    /** Spotify's default normalization level, in LUFS. YouTube's reference is the same. */
+    /** Spotify's default normalization level, in LUFS. */
     private const val TARGET_LUFS = -14f
     /** Headroom kept under 0 dBFS when a quiet track would be raised. */
     private const val PEAK_CEILING_DB = -1f
-    private val youtube = ConcurrentHashMap<String, Float>()
 
-    fun rememberYouTube(videoId: String, loudnessDb: Float) { if (loudnessDb.isFinite()) youtube[videoId] = loudnessDb }
 
     /** Gain to apply to [mediaId] in dB, or null when its loudness is unknown (local files included). */
     fun gainDb(context: Context, mediaId: String): Float? {
-        if (mediaId.startsWith(YTM_TRACK_PREFIX)) return youtube[mediaId.removePrefix(YTM_TRACK_PREFIX)]?.let { -it }
         if (!mediaId.startsWith("spotify:track:")) return null
         val values = AudioIndex.get(context).loudness(mediaId) ?: return null
         return spotifyGainDb(values[0], values[1])

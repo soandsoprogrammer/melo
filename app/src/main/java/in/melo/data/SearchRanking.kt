@@ -5,7 +5,7 @@ import `in`.melo.utils.foldForSearch
 /**
  * Orders results of several catalogues in one list, as the official search orders its own: how
  * closely the name matches what was typed first, then the rank each service gave the result.
- * A track, album or artist found on Spotify and on YouTube Music is shown once, at the better rank of
+ * A track, album or artist found on Spotify and on the music server is shown once, at the better rank of
  * the two, as the version of the source listed first (Spotify): its page has the account's actions
  * and Spotify's figures. Device files are always kept.
  */
@@ -58,17 +58,4 @@ object SearchRanking {
         val title = item.title.foldForSearch().replace(Regex("\\s*[(\\[].*$"), "").trim()
         return "${item.kind}|$title|${if (item.kind == MusicKind.Artist) "" else artist}"
     }
-}
-
-private val PODCAST_CONTAINER_TITLE = Regex("\\b(?:podcasts?|episodes?|shows?)\\b", RegexOption.IGNORE_CASE)
-
-/** Podcast containers belong in the Podcasts catalogue, not regular music search or its history. */
-internal fun Music.isPodcastSearchContainer(): Boolean {
-    // Song rows are never filtered, whatever their title or artist says. Other result kinds can
-    // still represent a podcast container depending on which catalogue returned the hit.
-    if (kind == MusicKind.Track) return false
-    val ytmBrowseId = id.removePrefix(`in`.melo.data.youtube.YTM_PLAYLIST_PREFIX)
-    return id.startsWith(`in`.melo.data.youtube.YTM_PODCAST_PREFIX) ||
-        ytmBrowseId.startsWith("MPSP") || ytmBrowseId.startsWith("MPED") ||
-        PODCAST_CONTAINER_TITLE.containsMatchIn("$title $subtitle")
 }

@@ -71,7 +71,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MusicServerScreen(model: MeloModel, padding: PaddingValues, onBack: () -> Unit) {
+internal fun MusicServerScreen(
+    model: MeloModel,
+    padding: PaddingValues,
+    showBackButton: Boolean = true,
+    onAppSettings: (() -> Unit)? = null,
+    onBack: () -> Unit,
+) {
+    var addingTrack by remember { mutableStateOf<`in`.melo.data.Music?>(null) }
     val context = LocalContext.current
     val server = remember(context) { MusicServer.get(context) }
     val scope = rememberCoroutineScope()
@@ -154,11 +161,14 @@ internal fun MusicServerScreen(model: MeloModel, padding: PaddingValues, onBack:
             TopAppBar(
                 title = { Text(if (albumId != null && !showForm) albumTitle else stringResource(R.string.music_server_title)) },
                 navigationIcon = {
-                    IconButton(onClick = ::goBack) {
+                    if (showBackButton || albumId != null || editing) IconButton(onClick = ::goBack) {
                         Icon(MeloIcons.ArrowBack, stringResource(R.string.music_server_back))
                     }
                 },
                 actions = {
+                    if (onAppSettings != null) IconButton(onClick = onAppSettings) {
+                        Icon(MeloIcons.Settings, stringResource(R.string.common_settings))
+                    }
                     if (!showForm) {
                         IconButton(onClick = {
                             address = account?.url?.toString().orEmpty()
@@ -311,7 +321,8 @@ internal fun MusicServerScreen(model: MeloModel, padding: PaddingValues, onBack:
                         }
                     }
                     itemsIndexed(page.songs, key = { _, song -> song.id }) { index, song ->
-                        ServerLibraryRow(song.imageUrl, song.title, listOf(song.subtitle, song.quality).filter(String::isNotBlank).joinToString(" · ")) {
+                        ServerLibraryRow(song.imageUrl, song.title, listOf(song.subtitle, song.quality).filter(String::isNotBlank).joinToString(" · "),
+                            onAdd = { addingTrack = song }) {
                             focus.clearFocus()
                             model.ui.playSongs(queuedSongs, queuedSongs[index], queueName)
                             model.ui.expandPlayerSheet()
@@ -342,10 +353,13 @@ internal fun MusicServerScreen(model: MeloModel, padding: PaddingValues, onBack:
             }
         }
     }
+    addingTrack?.let { track ->
+        `in`.melo.presentation.components.AddToLocalPlaylistSheet(track, model.ui) { addingTrack = null }
+    }
 }
 
 @Composable
-private fun ServerLibraryRow(artwork: String?, title: String, subtitle: String, onClick: () -> Unit) {
+private fun ServerLibraryRow(artwork: String?, title: String, subtitle: String, onAdd: (() -> Unit)? = null, onClick: () -> Unit) {
     val shape = MeloLayout.SmallArtworkShape
     Row(
         Modifier.fillMaxWidth().clip(shape).clickable(onClick = onClick).padding(vertical = 6.dp),
@@ -365,6 +379,9 @@ private fun ServerLibraryRow(artwork: String?, title: String, subtitle: String, 
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 1,
                     overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+        }
+        if (onAdd != null) IconButton(onClick = onAdd) {
+            Icon(MeloIcons.Add, stringResource(R.string.playlist_add_to))
         }
     }
 }

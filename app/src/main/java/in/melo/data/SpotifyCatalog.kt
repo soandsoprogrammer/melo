@@ -39,7 +39,7 @@ data class ArtistProfile(
     val appearsOn: List<String> = emptyList(),
     val biography: String = "",
     val headerImageUrl: String? = null,
-    /** Counts YouTube Music only gives rounded ("28.3M"): shown in the short form. */
+    /** Rounded counts ("28.3M"): shown in the short form. */
     val approximate: Boolean = false,
 )
 

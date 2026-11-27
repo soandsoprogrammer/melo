@@ -1,7 +1,6 @@
 package `in`.melo.data
 
 import `in`.melo.data.preferences.AppSettings
-import `in`.melo.data.youtube.abbreviatedCount
 import `in`.melo.playback.TrackLoudness
 import `in`.melo.utils.matchesWords
 import org.junit.Assert.assertEquals
@@ -65,13 +64,6 @@ class ReportedIssuesTest {
         assertTrue(matchesWords("  ", "anything"))
     }
 
-    @Test
-    fun youTubeCountsAreExpanded() {
-        assertEquals(28_300_000L, abbreviatedCount("28.3M monthly audience"))
-        assertEquals(150_000L, abbreviatedCount("150K"))
-        assertEquals(1_200_000_000L, abbreviatedCount("1.2B plays"))
-        assertNull(abbreviatedCount("none"))
-    }
 
     @Test
     fun newSettingsSurviveABackupAndUnknownSwipeValuesFallBack() {
@@ -104,32 +96,32 @@ class ReportedIssuesTest {
     fun mixedSearchPutsTheClosestNameFirstAndShowsATrackOnce() {
         val spotifyArtist = Music("spotify:artist:0000000000000000000001", "Daft Punk", "Artist", MusicKind.Artist)
         val spotifyTrack = Music("spotify:track:0000000000000000000002", "One More Time", "Daft Punk", MusicKind.Track)
-        val youTubeSame = Music("ytm:track:abc", "One More Time", "Daft Punk", MusicKind.Track)
-        val youTubeAlbum = Music("ytm:album:MPREb_x", "Daft Punk Live", "Daft Punk", MusicKind.Album)
+        val serverSame = Music("music-server:library:abc", "One More Time", "Daft Punk", MusicKind.Track)
+        val serverAlbum = Music("music-server-album:library:x", "Daft Punk Live", "Daft Punk", MusicKind.Album)
         val device = Music("local:track:1", "Da Funk", "Daft Punk", MusicKind.Track)
         val merged = SearchRanking.merge("daft punk", listOf(
             SearchRanking.Source(listOf(spotifyTrack, spotifyArtist)),
-            SearchRanking.Source(listOf(youTubeSame, youTubeAlbum), 0.97),
+            SearchRanking.Source(listOf(serverSame, serverAlbum), 0.97),
             SearchRanking.Source(listOf(device), 1.02, deduplicated = false),
         ))
         assertEquals(spotifyArtist, merged.first())
         assertTrue(spotifyTrack in merged)
-        assertFalse(youTubeSame in merged)
-        assertTrue(youTubeAlbum in merged && device in merged)
+        assertFalse(serverSame in merged)
+        assertTrue(serverAlbum in merged && device in merged)
         assertEquals(merged.size, merged.distinctBy(Music::id).size)
     }
 
     @Test
     fun mixedSearchKeepsSpotifysVersionAtTheBetterRank() {
-        // YouTube Music puts its artist card first; Spotify lists a track before the same artist.
+        // The server puts its artist card first; Spotify lists a track before the same artist.
         val spotifyTrack = Music("spotify:track:0000000000000000000002", "Garage", "Wailtoad", MusicKind.Track)
         val spotifyArtist = Music("spotify:artist:0000000000000000000001", "Wailtoad", "Artist", MusicKind.Artist)
-        val youTubeArtist = Music("ytm:artist:UCx", "Wailtoad", "Artist", MusicKind.Artist)
+        val serverArtist = Music("music-server-artist:library:x", "Wailtoad", "Artist", MusicKind.Artist)
         val merged = SearchRanking.merge("wailtoad", listOf(
             SearchRanking.Source(listOf(spotifyTrack, spotifyArtist, spotifyTrack.copy(id = "spotify:track:0000000000000000000003", title = "Other"))),
-            SearchRanking.Source(listOf(youTubeArtist), 0.97),
+            SearchRanking.Source(listOf(serverArtist), 0.97),
         ))
         assertEquals(spotifyArtist, merged.first())
-        assertFalse(youTubeArtist in merged)
+        assertFalse(serverArtist in merged)
     }
 }

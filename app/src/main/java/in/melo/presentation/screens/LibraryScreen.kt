@@ -181,7 +181,6 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
     val library by model.library.collectAsStateWithLifecycle()
     val stable by ui.stablePlayerState.collectAsStateWithLifecycle()
     val discovery by model.discovery.collectAsStateWithLifecycle()
-    val youTubeAccount by model.youTubeAccount.collectAsStateWithLifecycle()
     val spotifyProfile by model.spotifyAccountProfile.collectAsStateWithLifecycle()
     val libraryTabs = if (discovery.spotifyEnabled) accountTabs else guestTabs
     var savedTab by rememberSaveable { mutableStateOf(0) }
@@ -216,8 +215,7 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
     var showSortSheet by remember { mutableStateOf(false) }
     var creatingPlaylist by remember { mutableStateOf(false) }
     val localPlaylists by model.localPlaylists.collectAsStateWithLifecycle()
-    val youTubePlaylists by model.youTubePlaylists.collectAsStateWithLifecycle()
-    val youTubeLoading by model.youTubeLoading.collectAsStateWithLifecycle()
+    val serverPlaylists by model.serverPlaylists.collectAsStateWithLifecycle()
     val localTracks by model.localTracks.collectAsStateWithLifecycle()
     val localTitle = stringResource(R.string.library_tab_local)
     val downloads by ui.downloads.collectAsStateWithLifecycle()
@@ -240,8 +238,8 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
     fun sortOf(tab: LibraryTabId): SortOption =
         sortOptions(tab).firstOrNull { it.storageKey == sortKeys[tab.storageKey] } ?: SortOption.SongDefaultOrder
 
-    val filteredPlaylists = remember(localPlaylists, youTubePlaylists, content?.playlists, searchQuery, sortKeys) {
-        (localPlaylists.map { it.asMusic() } + youTubePlaylists + content?.playlists.orEmpty())
+    val filteredPlaylists = remember(localPlaylists, serverPlaylists, content?.playlists, searchQuery, sortKeys) {
+        (localPlaylists.map { it.asMusic() } + serverPlaylists + content?.playlists.orEmpty())
             .sortedFor(sortOf(LibraryTabId.PLAYLISTS)).matchingLibrarySearch(searchQuery)
     }
     val filteredAlbums = remember(content?.albums, searchQuery, sortKeys) {
@@ -297,9 +295,6 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
                 HomeGradientTopBar(
                     onSettingsClick = { navController.navigateSafely(Screen.Settings.route) },
                     onHistoryClick = { navController.navigateSafely(Screen.History.route) },
-                    profileImageUrl = youTubeAccount?.photoUrl,
-                    profileName = youTubeAccount?.name,
-                    profileHandle = youTubeAccount?.handle,
                     spotifyConnected = discovery.spotifyEnabled,
                     spotifyProfile = spotifyProfile,
                     onProfileClick = { navController.navigateSafely(Screen.SettingsCategory.createRoute("account")) },
@@ -419,7 +414,7 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
                         }
                         val bottomPadding = paddingValues.calculateBottomPadding() + MiniPlayerHeight + 24.dp
                         PullToRefreshBox(
-                            isRefreshing = (library.loading || youTubeLoading) && content != null,
+                            isRefreshing = library.loading && content != null,
                             onRefresh = model::refreshLibrary,
                             modifier = Modifier.fillMaxSize(),
                         ) {
@@ -439,7 +434,7 @@ fun LibraryScreen(model: MeloModel, navController: NavHostController, paddingVal
                                 HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
                                     val tab = libraryTabs[page]
                                     val isEmpty = when (tab) {
-                                        LibraryTabId.PLAYLISTS -> localPlaylists.isEmpty() && youTubePlaylists.isEmpty() && content.playlists.isEmpty()
+                                        LibraryTabId.PLAYLISTS -> localPlaylists.isEmpty() && serverPlaylists.isEmpty() && content.playlists.isEmpty()
                                         LibraryTabId.LIKED -> content.savedTrackCount == 0
                                         LibraryTabId.ALBUMS -> content.albums.isEmpty()
                                         LibraryTabId.ARTISTS -> content.artists.isEmpty()

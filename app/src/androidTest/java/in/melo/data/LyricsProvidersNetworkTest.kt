@@ -20,9 +20,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LyricsProvidersNetworkTest {
     private val songs = listOf(
-        Song("ytm:probe-1", "Blinding Lights", "The Weeknd", album = "After Hours", duration = 200_000),
-        Song("ytm:probe-2", "Shape of You", "Ed Sheeran", album = "÷ (Deluxe)", duration = 233_000),
-        Song("ytm:probe-3", "Bohemian Rhapsody - Remastered 2011", "Queen", album = "A Night At The Opera", duration = 355_000),
+        Song("local:probe-1", "Blinding Lights", "The Weeknd", album = "After Hours", duration = 200_000),
+        Song("local:probe-2", "Shape of You", "Ed Sheeran", album = "÷ (Deluxe)", duration = 233_000),
+        Song("local:probe-3", "Bohemian Rhapsody - Remastered 2011", "Queen", album = "A Night At The Opera", duration = 355_000),
     )
 
     @Test fun everyProviderIsReportedAndTheRaceFindsWordTimings(): Unit = runBlocking {

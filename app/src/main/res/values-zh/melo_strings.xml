@@ -5,7 +5,7 @@
     <string name="melo_home_subtitle">少一点喧嚣，多一点音乐。</string>
     <string name="melo_discover">发现音乐</string>
     <string name="melo_intro">为听音乐而设计</string>
-    <string name="melo_intro_sources">Spotify、YouTube Music 和本地文件，\n集中在同一个播放器。</string>
+    <string name="melo_intro_sources">Spotify、音乐服务器 和本地文件，\n集中在同一个播放器。</string>
     <string name="melo_edition">MELO · 简洁的音乐播放器</string>
     <string name="melo_updates_unavailable">此版本未配置 Melo 更新。</string>
     <string name="melo_previous">上一首</string>

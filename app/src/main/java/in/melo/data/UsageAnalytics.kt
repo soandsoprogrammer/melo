@@ -50,6 +50,6 @@ object UsageAnalytics {
 
     private fun safeCatalog(value: String): String = value.takeIf { it in CATALOGS } ?: "other"
 
-    private val CATALOGS = setOf("spotify_catalog", "youtube_music", "local")
+    private val CATALOGS = setOf("spotify_catalog", "music_server", "local")
     private val ERROR_CATEGORIES = setOf("network", "decoder", "authorization", "unavailable", "other")
 }

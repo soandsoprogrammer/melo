@@ -80,14 +80,14 @@ import `in`.melo.ui.theme.MeloAlpha
 @Composable
 internal fun playlistKindName(kind: PlaylistKind): String = stringResource(when (kind) {
     PlaylistKind.Spotify -> R.string.search_source_spotify
-    PlaylistKind.YouTubeMusic -> R.string.search_source_youtube
+    PlaylistKind.MusicServer -> R.string.music_server_title
     PlaylistKind.MultiService -> R.string.badge_local
 })
 
 @Composable
 private fun PlaylistKindIcon(kind: PlaylistKind, modifier: Modifier = Modifier, tint: Color = MaterialTheme.colorScheme.primary) = when (kind) {
     PlaylistKind.Spotify -> Icon(meloPainter(R.drawable.ic_source_spotify), null, modifier, tint = tint)
-    PlaylistKind.YouTubeMusic -> Icon(meloPainter(R.drawable.ic_source_youtube_music), null, modifier, tint = tint)
+    PlaylistKind.MusicServer -> Icon(meloPainter(R.drawable.rounded_library_music_24), null, modifier, tint = tint)
     PlaylistKind.MultiService -> Icon(MeloIcons.LibraryMusic, null, modifier, tint = tint)
 }
 
@@ -95,9 +95,9 @@ private fun PlaylistKindIcon(kind: PlaylistKind, modifier: Modifier = Modifier, 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ConvertTargetSheet(model: MeloModel, item: Music, onDismiss: () -> Unit, onPick: (PlaylistKind) -> Unit) {
-    val google by model.youTubeAccount.collectAsStateWithLifecycle()
+    val server by model.serverLibrary.collectAsStateWithLifecycle()
     val discovery by model.discovery.collectAsStateWithLifecycle()
-    val targets = remember(item.id, google, discovery.spotifyEnabled) { model.conversionTargets(item) }
+    val targets = remember(item.id, server, discovery.spotifyEnabled) { model.conversionTargets(item) }
     `in`.melo.presentation.components.MeloBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = MeloLayout.PageGutter).navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(MeloLayout.Space2)) {
             Text(stringResource(R.string.convert_to), Modifier.padding(start = 8.dp, bottom = 8.dp),
@@ -113,9 +113,9 @@ internal fun ConvertTargetSheet(model: MeloModel, item: Music, onDismiss: () -> 
                         Text(stringResource(when {
                             kind == PlaylistKind.MultiService -> R.string.convert_target_multi
                             !available && kind == PlaylistKind.Spotify -> R.string.convert_needs_spotify
-                            !available -> R.string.convert_needs_google
+                            !available -> R.string.music_server_description
                             kind == PlaylistKind.Spotify -> R.string.convert_target_spotify
-                            else -> R.string.convert_target_youtube
+                            else -> R.string.music_server_title
                         }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -179,7 +179,6 @@ fun ConvertScreen(model: MeloModel, navController: NavHostController, playlistId
 private fun ConversionContent(model: MeloModel, navController: NavHostController, session: PlaylistConversion, inner: PaddingValues) {
     val state by session.state.collectAsState()
     val createFailed = stringResource(R.string.convert_failed)
-    val youTubeRefused = stringResource(R.string.youtube_refused)
     val createdMessage = stringResource(R.string.convert_done)
     var onlyReview by remember { mutableStateOf(false) }
     var picking by remember { mutableStateOf<Int?>(null) }
@@ -241,11 +240,7 @@ private fun ConversionContent(model: MeloModel, navController: NavHostController
                     onClick = {
                         session.create(
                             creator = { name, tracks -> model.createConverted(session.target, name, tracks) },
-                            failed = { failure ->
-                                val status = (failure as? `in`.melo.data.youtube.YouTubeFailure)?.status
-                                if (status == "403" || status == "429") youTubeRefused
-                                else createFailed
-                            },
+                            failed = { createFailed },
                         )
                     },
                     enabled = state.finished && state.tracks.isNotEmpty() && !state.creating && state.name.isNotBlank(),
@@ -331,7 +326,7 @@ private fun MatchPickerSheet(model: MeloModel, session: PlaylistConversion, row:
     var loading by remember { mutableStateOf(false) }
     val searchSource = when (session.target) {
         PlaylistKind.Spotify -> MeloModel.TRACKS_SPOTIFY
-        PlaylistKind.YouTubeMusic -> MeloModel.TRACKS_YOUTUBE
+        PlaylistKind.MusicServer -> MeloModel.TRACKS_SERVER
         PlaylistKind.MultiService -> null
     }
     LaunchedEffect(query) {

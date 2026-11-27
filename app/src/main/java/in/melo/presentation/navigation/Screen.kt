@@ -6,18 +6,12 @@ import java.net.URLEncoder
 @Immutable
 sealed class Screen(val route: String) {
     object Home : Screen("home")
-    object Explore : Screen("explore")
     object Search : Screen("search")
     object Library : Screen("library")
     object MusicServer : Screen("music_server")
-    object Podcasts : Screen("podcasts")
-    object PodcastDetail : Screen("podcast_detail/{browseId}") {
-        fun createRoute(browseId: String) = "podcast_detail/${URLEncoder.encode(browseId, "UTF-8")}"
-    }
     object Settings : Screen("settings")
     object Equalizer : Screen("equalizer")
     object History : Screen("history")
-    object GoogleSignIn : Screen("google_sign_in")
     object DiscordLogin : Screen("discord_login")
     object Convert : Screen("convert/{playlistId}/{target}") {
         fun createRoute(playlistId: String, target: String) = "convert/${URLEncoder.encode(playlistId, "UTF-8")}/$target"

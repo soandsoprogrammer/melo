@@ -107,7 +107,7 @@
     <string name="home_account_not_connected">Not connected</string>
     <string name="home_speed_dial_history_description">Recently played.</string>
     <string name="home_dial_page">%1$d of %2$d</string>
-    <string name="home_personalized_feed_title">Your YouTube Music feed</string>
+    <string name="home_personalized_feed_title">Your music server feed</string>
     <string name="home_dial_customize">Customize Speed Dial</string>
     <string name="home_dial_speed_dial">Show Speed Dial</string>
     <string name="home_dial_artist_dial">Show Artist Dial</string>
@@ -121,7 +121,6 @@
     <string name="home_dial_scroll_to_feed">Scroll to recommendations</string>
     <string name="home_dial_source">Tile source</string>
     <string name="home_dial_source_history">History</string>
-    <string name="home_dial_source_youtube">YT Music</string>
     <string name="home_dial_source_spotify">Spotify</string>
     <string name="home_dial_rows">Rows per page</string>
     <string name="home_dial_rows_value">%1$d rows</string>
@@ -141,7 +140,7 @@
     <string name="explore_subtitle">Moods, genres, and new ways to listen.</string>
     <string name="explore_unavailable">Explore is unavailable</string>
     <string name="explore_empty_title">Nothing to explore yet</string>
-    <string name="explore_empty_body">YouTube Music has no moods or genres available right now.</string>
+    <string name="explore_empty_body">music server has no moods or genres available right now.</string>
     <string name="explore_category_empty">No playlists are available for this category yet.</string>
     <string name="explore_back">Back to Explore</string>
     <string name="nav_bar_explore">Explore</string>
@@ -160,7 +159,7 @@
     <string name="podcasts_load_error_title">Podcasts unavailable</string>
     <string name="podcasts_retry">Retry</string>
     <string name="podcasts_empty_title">No podcasts to show</string>
-    <string name="podcasts_empty_body">YouTube Music has no podcast shelves available right now.</string>
+    <string name="podcasts_empty_body">music server has no podcast shelves available right now.</string>
     <string name="podcasts_loading_more">Loading more…</string>
     <string name="podcasts_load_more">Load more</string>
     <string name="podcasts_episodes">Episodes</string>
@@ -174,11 +173,9 @@
     <string name="home_new_music_tag">New music</string>
     <string name="home_radio_eyebrow">Based on your listening</string>
     <string name="home_new_release_tag">New release from an artist you play</string>
-    <string name="home_youtube_mix_tag">YouTube Music mix</string>
-    <string name="home_youtube_radio_tag">YouTube Music radio</string>
     <string name="home_artist_radio_tag">Related artist radio</string>
     <string name="home_find_your_mood">Find your mood</string>
-    <string name="home_find_your_mood_description">Play a mix from YouTube Music’s mood shelves.</string>
+    <string name="home_find_your_mood_description">Play a mix from music server’s mood shelves.</string>
     <string name="home_mood_energy">Energy</string>
     <string name="home_mood_relax">Relax</string>
     <string name="home_mood_feeling_blue">Feeling blue</string>
@@ -299,14 +296,11 @@
     <string name="source_local">Local</string>
     <string name="source_addon">Add-on</string>
     <string name="source_spotify">Spotify</string>
-    <string name="source_youtube">YouTube Music</string>
     <string name="search_source_spotify">Spotify</string>
-    <string name="search_source_youtube">YouTube Music</string>
-    <string name="youtube_search_failed">The YouTube Music search was interrupted.</string>
     <string name="local_file_missing">“%1$s” is not on this device.</string>
     <string name="continue_without_account">Continue without an account</string>
     <string name="settings_account_signin_title">Sign in to Spotify</string>
-    <string name="settings_account_signin_subtitle">Spotify tracks play from YouTube Music until you sign in.</string>
+    <string name="settings_account_signin_subtitle">Spotify tracks play from music server until you sign in.</string>
     <string name="settings_account_guest_subtitle">Not signed in</string>
     <string name="playlist_delete_spotify_confirm">Delete “%1$s” from your Spotify library?</string>
     <string name="playlist_deleted">“%1$s” deleted</string>
@@ -314,13 +308,13 @@
     <string name="playlist_exported">Playlist exported</string>
     <string name="playlist_import">Import a playlist</string>
     <string name="import_from_file">CSV file exported by Melo</string>
-    <string name="import_from_link">YouTube, YouTube Music or Spotify link</string>
+    <string name="import_from_link">Spotify link</string>
     <string name="import_link_label">Playlist link</string>
     <string name="import_action">Import</string>
     <string name="import_running">Importing…</string>
     <string name="import_done">“%1$s” imported: %2$d tracks</string>
     <string name="import_no_tracks">No tracks to import.</string>
-    <string name="import_unknown_link">This link is not a YouTube, YouTube Music or Spotify playlist.</string>
+    <string name="import_unknown_link">This link is not a Spotify playlist.</string>
     <string name="spotify_link_unavailable">Melo couldn’t open this Spotify link.</string>
     <string name="share_spotify_link">Open Spotify link in Melo</string>
     <string name="settings_link_handling_section">Link handling</string>
@@ -405,38 +399,17 @@
     <string name="history_clear_message">Removes the plays recorded on this device. Spotify\'s own history is not changed.</string>
     <string name="history_clear_confirm">Clear</string>
     <string name="login_optional">Optional</string>
-    <!-- Google account and YouTube Music playlists -->
     <string name="action_ok">OK</string>
     <string name="settings_accounts_title">Accounts</string>
-    <string name="google_connect_title">Connect a Google account</string>
-    <string name="google_connect_subtitle">Your YouTube Music playlists in Melo, synced with the account.</string>
     <string name="google_connected_subtitle">Google account</string>
-    <string name="google_disconnect_title">Disconnect the Google account</string>
-    <string name="google_disconnect_subtitle">Removes the session from this device. Your playlists stay on YouTube Music.</string>
-    <string name="google_signin_title">Google account</string>
-    <string name="google_signin_checking">Opening YouTube Music…</string>
-    <string name="google_signin_failed">YouTube Music did not open a session with this account.</string>
     <string name="google_signin_retry">Try again</string>
-    <string name="google_signin_use_account">Use this account</string>
-    <string name="google_session_closed">Google closed the YouTube Music session. Connect the account again in Settings → Accounts.</string>
-    <string name="home_youtube_playlists">YouTube Music playlists</string>
-    <string name="youtube_playlist_account">On my YouTube Music account</string>
-    <string name="youtube_playlist_public">Public</string>
-    <string name="youtube_playlist_edit">Edit YouTube Music playlist</string>
-    <string name="youtube_playlist_failed">This YouTube Music playlist could not be read.</string>
-    <string name="youtube_playlist_only_youtube">A YouTube Music playlist only takes YouTube Music tracks.</string>
-    <string name="youtube_playlist_row_gone">This track is no longer in the playlist.</string>
-    <string name="playlist_delete_youtube_confirm">Delete “%1$s” from your YouTube Music account?</string>
-    <string name="playlist_remove_youtube_confirm">Remove “%1$s” from your YouTube Music library?</string>
 
     <!-- Converter -->
     <string name="convert_to">Convert to…</string>
     <string name="convert_title">Converter</string>
     <string name="convert_target_spotify">New playlist on your Spotify account</string>
-    <string name="convert_target_youtube">New playlist on your YouTube Music account</string>
     <string name="convert_target_multi">New playlist on this device, tracks kept as they are</string>
     <string name="convert_needs_spotify">Sign in to Spotify in Settings → Accounts</string>
-    <string name="convert_needs_google">Connect a Google account in Settings → Accounts</string>
     <string name="convert_reading">Reading the playlist…</string>
     <string name="convert_read_failed">The playlist could not be read.</string>
     <string name="convert_searching">Looking up tracks: %1$d of %2$d</string>
@@ -444,7 +417,6 @@
     <string name="convert_to_review">To check (%1$d)</string>
     <string name="convert_create">Create playlist · %1$s</string>
     <string name="convert_failed">The playlist could not be created.</string>
-    <string name="youtube_refused">YouTube Music is refusing requests from this connection for now. Try again in a few minutes.</string>
     <string name="convert_done">“%1$s” created</string>
     <string name="convert_row_searching">Searching…</string>
     <string name="convert_row_missing">No match found</string>
@@ -466,7 +438,7 @@
     <string name="settings_player_menu_title">Options button in the player</string>
     <string name="settings_player_menu_subtitle">Show track options in the player.</string>
     <string name="settings_normalization_title">Normalize volume</string>
-    <string name="settings_normalization_subtitle">Plays tracks at a similar loudness, from the values Spotify and YouTube Music publish. Local files are not changed.</string>
+    <string name="settings_normalization_subtitle">Plays tracks at a similar loudness, from the values Spotify and music server publish. Local files are not changed.</string>
     <string name="settings_mini_swipe_title">Swipe on the mini player</string>
     <string name="settings_mini_swipe_subtitle">Left and right on the bar at the bottom of the screen. Left plays the next track, right the previous one.</string>
     <string name="settings_mini_swipe_tracks">Change track</string>
@@ -487,12 +459,7 @@
     <string name="artist_world_rank">#%1$d in the world</string>
     <string name="artist_show_all">Show all (%1$d)</string>
     <string name="artist_show_less">Show less</string>
-    <plurals name="youtube_tracks_refused">
-        <item quantity="one">%1$d track could not be added: YouTube Music refused it.</item>
-        <item quantity="other">%1$d tracks could not be added: YouTube Music refused them.</item>
-    </plurals>
     <string name="search_source_all">All</string>
-    <string name="search_source_youtube_short">YouTube</string>
     <string name="search_source_device">Device</string>
     <string name="queue_section_queued">Next in queue</string>
     <string name="queue_section_next_from">Next from: %1$s</string>
@@ -516,10 +483,10 @@
     <string name="addons_direct_stream_subtitle">Play queued tracks from your add-ons when they hold them</string>
     <string name="addons_add_one_first">Add an add-on first</string>
     <string name="addons_lossless_upgrade">Upgrade to lossless while playing</string>
-    <string name="addons_lossless_upgrade_subtitle">Switch a track playing from YouTube Music to an add-on’s lossless copy of the same recording</string>
+    <string name="addons_lossless_upgrade_subtitle">Switch a track playing from music server to an add-on’s lossless copy of the same recording</string>
     <string name="upgrade_quality">Upgrade quality</string>
     <string name="upgrade_searching">Looking for lossless…</string>
-    <string name="addons_direct_stream_footer">A track no add-on holds, or one already downloaded, still plays from YouTube Music. If an add-on stream fails, playback carries on from YouTube Music. An upgrade switches only to a copy that runs the same length and plays, with a short break in the audio.</string>
+    <string name="addons_direct_stream_footer">A track no add-on holds, or one already downloaded, still plays from music server. If an add-on stream fails, playback carries on from music server. An upgrade switches only to a copy that runs the same length and plays, with a short break in the audio.</string>
     <string name="addons_tolerance">Length tolerance</string>
     <string name="addons_tolerance_value">%1$d s</string>
     <string name="addons_section">Your add-ons</string>
@@ -589,7 +556,6 @@
     <string name="pipeline_route">Route</string>
     <string name="pipeline_direct">Direct playback</string>
     <string name="pipeline_system_mixer">System mixer</string>
-    <string name="pipeline_source_youtube">YouTube Music</string>
     <string name="pipeline_source_device">On this device</string>
     <string name="pipeline_source_addon">%1$s (add-on)</string>
     <string name="pipeline_route_speaker">Phone speaker</string>

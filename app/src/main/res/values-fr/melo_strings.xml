@@ -4,7 +4,7 @@
     <string name="melo_home_subtitle">Un peu moins de bruit. Beaucoup plus de musique.</string>
     <string name="melo_discover">Découvrir</string>
     <string name="melo_intro">Place à la musique.</string>
-    <string name="melo_intro_sources">Spotify. YouTube Music. Vos fichiers.\nTout simplement réunis.</string>
+    <string name="melo_intro_sources">Spotify. serveur de musique. Vos fichiers.\nTout simplement réunis.</string>
     <string name="melo_edition">MELO / LA MUSIQUE, SIMPLEMENT</string>
     <string name="melo_updates_unavailable">Les mises à jour de Melo ne sont pas configurées pour cette version.</string>
     <string name="melo_previous">Piste précédente</string>

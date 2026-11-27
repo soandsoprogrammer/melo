@@ -117,7 +117,7 @@ fun SongInfoBottomSheet(
     val discovery by playerViewModel.model.discovery.collectAsStateWithLifecycle()
     // Likes and radios are Spotify features: they need a Spotify track and an account.
     val spotifyPages = song.source == `in`.melo.data.MusicSource.Spotify && discovery.spotifyEnabled
-    // Albums and artists open on Spotify with an account, on YouTube Music otherwise (issue #8).
+    // Albums and artists open when catalogue details are available.
     val catalogPages = !song.isLocal
     `in`.melo.presentation.components.MeloBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
@@ -132,14 +132,12 @@ fun SongInfoBottomSheet(
             Row1Actions(
                 isFavorite = isFavorite,
                 onPlaySong = { onPlaySong(); onDismiss() },
-                // YouTube Music tracks are liked on the device (and on the Google account when there is one).
-                onToggleFavorite = if (spotifyPages || song.source == `in`.melo.data.MusicSource.YouTubeMusic) onToggleFavorite else null,
+                onToggleFavorite = if (spotifyPages || song.source == `in`.melo.data.MusicSource.MusicServer) onToggleFavorite else null,
                 onShareClick = if (song.isLocal) null else ({ context.shareMusic(song.toMusic()) }),
                 playButtonShape = MeloLayout.PillShape,
                 evenCornerRadiusElems = 26.dp
             )
             Row2Actions(onAddToQueue = onAddToQueue, onAddNextToQueue = onAddNextToQueue)
-            UpgradeQualityButton(song.id, onDismiss)
             RadioAndPinRow(
                 item = song.toMusic(),
                 playerViewModel = playerViewModel,
@@ -200,23 +198,6 @@ fun SongInfoBottomSheet(
             Spacer(Modifier.height(12.dp))
         }
     }
-}
-
-/** For the playing track while it is on YouTube Music's copy: look for a better one now. */
-@Composable
-private fun UpgradeQualityButton(songId: String, onDismiss: () -> Unit) {
-    val offerable by `in`.melo.playback.LosslessUpgrade.offerable.collectAsStateWithLifecycle()
-    val searching by `in`.melo.playback.LosslessUpgrade.searching.collectAsStateWithLifecycle()
-    if (offerable != songId) return
-    val looking = searching == songId
-    MeloButton(
-        text = stringResource(if (looking) R.string.upgrade_searching else R.string.upgrade_quality),
-        onClick = { `in`.melo.playback.LosslessUpgrade.askByHand(songId); onDismiss() },
-        modifier = Modifier.fillMaxWidth(),
-        icon = MeloIcons.Quality,
-        enabled = !looking,
-        style = MeloButtonStyle.Tonal,
-    )
 }
 
 @Composable
@@ -379,9 +360,9 @@ fun EntityOptionsSheet(
                 val discovery by playerViewModel.model.discovery.collectAsStateWithLifecycle()
                 val export = rememberPlaylistCsvExport(playerViewModel.model)
                 var deleting by remember { mutableStateOf(false) }
-                val youTubePlaylists by playerViewModel.model.youTubePlaylists.collectAsStateWithLifecycle()
+                val serverPlaylists by playerViewModel.model.serverPlaylists.collectAsStateWithLifecycle()
                 val inLibrary = item.isLocalPlaylist || (discovery.spotifyEnabled && item.id.startsWith("spotify:playlist:") &&
-                    library.content?.playlists?.any { it.id == item.id } == true) || youTubePlaylists.any { it.id == item.id }
+                    library.content?.playlists?.any { it.id == item.id } == true) || serverPlaylists.any { it.id == item.id }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MeloLayout.Space3)) {
                     MeloButton(
                         text = stringResource(R.string.playlist_export_csv_short),

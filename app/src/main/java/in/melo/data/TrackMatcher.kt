@@ -1,47 +1,12 @@
-package `in`.melo.data.youtube
+package `in`.melo.data
 
-import android.content.Context
-import androidx.core.content.edit
-import `in`.melo.data.Music
 import java.text.Normalizer
 
-/** What is known of a track that has to be found on YouTube Music. */
+/** Metadata used to match a recording. */
 data class MatchQuery(val key: String, val title: String, val artists: String, val durationMs: Int, val album: String = "")
 
-/**
- * Finds the YouTube Music recording of a track known by title, artists and duration: a Spotify track
- * played without a Spotify account. Matches are kept on the device, so a track is looked up once.
- */
+/** Scores recordings by their catalogue metadata. */
 object TrackMatcher {
-    private var app: Context? = null
-    fun init(context: Context) { if (app == null) app = context.applicationContext }
-    private val preferences get() = app?.getSharedPreferences("youtube_matches", Context.MODE_PRIVATE)
-
-    fun known(key: String): String? = preferences?.getString(key, null)
-
-    /** Blocking: searches the songs and the videos shelves, then keeps the best scored candidate. */
-    fun resolve(query: MatchQuery): String? {
-        known(query.key)?.let { return it }
-        val text = "${query.title.searchTitle()} ${primaryArtist(query.artists)}".trim()
-        val songs = runCatching { YouTubeMusic.searchSongs(text) }.getOrDefault(emptyList())
-        val best = bestMatch(query, songs, emptyList())
-        val chosen = if (best != null && best.second >= CONFIDENT) best else {
-            val videos = runCatching { YouTubeMusic.searchVideos(text) }.getOrDefault(emptyList())
-            bestMatch(query, songs, videos)
-        }
-        val videoId = chosen?.first?.youTubeVideoId ?: return null
-        preferences?.edit { putString(query.key, videoId) }
-        return videoId
-    }
-
-    fun forget(key: String) = preferences?.edit { remove(key) }
-
-    /** The candidate with the highest score, if it reaches [ACCEPTED]. Songs get a small advantage over videos. */
-    fun bestMatch(query: MatchQuery, songs: List<Music>, videos: List<Music>): Pair<Music, Double>? =
-        (songs.map { it to score(query, it) + SONG_BONUS } + videos.map { it to score(query, it) })
-            .filter { it.second >= ACCEPTED }
-            .maxByOrNull { it.second }
-
     /** 0..1: title (45 %), artist (35 %) and duration (20 %), minus versions the original is not. */
     fun score(query: MatchQuery, candidate: Music): Double {
         val title = titleSimilarity(query.title, candidate.title)
@@ -108,8 +73,6 @@ object TrackMatcher {
         .replace(FEATURING, " ")
         .trim().ifEmpty { this }
 
-    private fun String.searchTitle(): String = coreTitle()
-    private fun primaryArtist(artists: String): String = artists.split(",").firstOrNull()?.trim().orEmpty()
 
     private fun String.containsWord(word: String): Boolean =
         word.isNotEmpty() && (" $this ").contains(" $word ")
@@ -144,7 +107,6 @@ object TrackMatcher {
     private const val ACCEPTED = 0.55
     private const val CONFIDENT = 0.8
     private const val MIN_TITLE = 0.45
-    private const val SONG_BONUS = 0.05
     private const val ALBUM_BONUS = 0.05
     private const val VERSION_PENALTY = 0.25
     private val VERSION_WORDS = listOf(

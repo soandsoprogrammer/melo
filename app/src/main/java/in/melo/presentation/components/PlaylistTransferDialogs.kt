@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/** Imports a CSV file exported by Melo, or a YouTube, YouTube Music or Spotify playlist link. */
+/** Imports a CSV file exported by Melo, or a Spotify playlist link. */
 @Composable
 fun ImportPlaylistDialog(model: MeloModel, onDismiss: () -> Unit, onImported: (Music) -> Unit) {
     val context = LocalContext.current
@@ -146,8 +146,7 @@ fun DeletePlaylistDialog(model: MeloModel, item: Music, onDismiss: () -> Unit, o
         text = {
             Text(stringResource(when {
                 item.isLocalPlaylist -> R.string.playlist_delete_confirm
-                item.id.startsWith(`in`.melo.data.youtube.YTM_PLAYLIST_PREFIX) ->
-                    if (model.youTubePlaylistOwned(item)) R.string.playlist_delete_youtube_confirm else R.string.playlist_remove_youtube_confirm
+                `in`.melo.data.server.MusicServerUris.isPlaylist(item.id) -> R.string.music_server_delete_playlist
                 else -> R.string.playlist_delete_spotify_confirm
             }, item.title))
         },

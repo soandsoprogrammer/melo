@@ -1,19 +1,10 @@
 package `in`.melo.presentation.navigation
 
-internal fun isMainRootRoute(route: String?): Boolean = when (route) {
-    Screen.Home.route,
-    Screen.Explore.route,
-    Screen.Search.route,
-    Screen.Library.route,
-    Screen.Podcasts.route -> true
-    else -> false
-}
+internal fun isMainRootRoute(route: String?): Boolean = mainRootRouteIndex(route) != null
 
 internal fun mainRootRouteIndex(route: String?): Int? = when (route) {
     Screen.Home.route -> 0
-    Screen.Explore.route -> 1
-    Screen.Search.route -> 2
-    Screen.Library.route -> 3
-    Screen.Podcasts.route -> 4
+    Screen.Search.route -> 1
+    Screen.Library.route -> 2
     else -> null
 }

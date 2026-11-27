@@ -16,14 +16,14 @@ class ListeningHistoryTest {
     }
 
     @Test fun mergedHistoryIsNewestFirstWithoutTheSamePlayTwice() {
-        val local = listOf(HistoryEntry(track("ytm:x"), 9_000_000), HistoryEntry(track("spotify:track:a"), 5_000_000))
+        val local = listOf(HistoryEntry(track("music-server:library:x"), 9_000_000), HistoryEntry(track("spotify:track:a"), 5_000_000))
         val spotify = listOf(
             HistoryEntry(track("spotify:track:a"), 5_100_000, fromSpotify = true),
             HistoryEntry(track("spotify:track:b"), 7_000_000, fromSpotify = true),
             HistoryEntry(track("spotify:track:a"), 1_000_000, fromSpotify = true),
         )
         val merged = mergeHistory(local, spotify)
-        assertEquals(listOf("ytm:x", "spotify:track:b", "spotify:track:a", "spotify:track:a"), merged.map { it.track.id })
+        assertEquals(listOf("music-server:library:x", "spotify:track:b", "spotify:track:a", "spotify:track:a"), merged.map { it.track.id })
         assertEquals(listOf(false, true, false, true), merged.map { it.fromSpotify })
     }
 

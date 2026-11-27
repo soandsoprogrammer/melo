@@ -75,36 +75,6 @@ internal fun AddonsSettings(model: MeloModel, navController: NavHostController) 
     }
 
     SettingsScaffold(stringResource(R.string.settings_addons_title), navController) {
-        SettingsSection(title = null, footer = stringResource(R.string.addons_direct_stream_footer)) {
-            SwitchSettingItem(
-                title = stringResource(R.string.addons_direct_stream),
-                subtitle = if (anyEnabled) stringResource(R.string.addons_direct_stream_subtitle)
-                    else stringResource(R.string.addons_add_one_first),
-                checked = settings.directSourceStream && anyEnabled,
-                onCheckedChange = { on -> model.ui.updateSettings { it.copy(directSourceStream = on) } },
-                leadingIcon = { Icon(MeloIcons.Quality, null, tint = MaterialTheme.colorScheme.onSurface) },
-                enabled = anyEnabled,
-            )
-            SwitchSettingItem(
-                title = stringResource(R.string.addons_lossless_upgrade),
-                subtitle = if (anyEnabled) stringResource(R.string.addons_lossless_upgrade_subtitle)
-                    else stringResource(R.string.addons_add_one_first),
-                checked = settings.losslessUpgrade && anyEnabled,
-                onCheckedChange = { on -> model.ui.updateSettings { it.copy(losslessUpgrade = on) } },
-                leadingIcon = { Icon(MeloIcons.GraphicEq, null, tint = MaterialTheme.colorScheme.onSurface) },
-                enabled = anyEnabled,
-            )
-            if ((settings.directSourceStream || settings.losslessUpgrade) && anyEnabled) {
-                SliderSettingsItem(
-                    label = stringResource(R.string.addons_tolerance),
-                    value = settings.addonLengthToleranceSec.toFloat(),
-                    valueRange = 1f..15f,
-                    steps = 13,
-                    onValueChange = { v -> model.ui.updateSettings { it.copy(addonLengthToleranceSec = v.toInt().coerceIn(1, 15)) } },
-                    valueText = { context.getString(R.string.addons_tolerance_value, it.toInt()) },
-                )
-            }
-        }
 
         SettingsSection(title = stringResource(R.string.addons_section), footer = stringResource(R.string.addons_footer)) {
             addons.forEach { config ->

@@ -18,7 +18,6 @@
     <string name="playback_error_decode">The received audio stream cannot be decoded. Try again or pick another track.</string>
     <string name="playback_error_output">Audio output could not start. Check the audio device, then try again.</string>
     <string name="playback_error_generic">This track cannot be played. Try again or pick another track.</string>
-    <string name="playback_error_youtube_match">This track was not found on YouTube Music.</string>
     <string name="lyrics_import_error_extension">Only .lrc and .ttml lyrics files are supported.</string>
     <string name="lyrics_import_error_type">The selected file type is not a supported lyrics file.</string>
     <string name="lyrics_import_error_size">The lyrics file is too large.</string>

@@ -141,7 +141,7 @@ private fun CategoryRow(title: String, subtitle: String, icon: ImageVector, onCl
 fun SettingsScreen(model: MeloModel, navController: NavHostController) {
     val settings by model.ui.settings.collectAsStateWithLifecycle()
     val discovery by model.discovery.collectAsStateWithLifecycle()
-    val google by model.youTubeAccount.collectAsStateWithLifecycle()
+    val server by model.serverLibrary.collectAsStateWithLifecycle()
     val spotifyProfile by model.spotifyAccountProfile.collectAsStateWithLifecycle()
     val context = LocalContext.current
     fun open(id: String) = navController.navigateSafely(Screen.SettingsCategory.createRoute(id))
@@ -151,13 +151,13 @@ fun SettingsScreen(model: MeloModel, navController: NavHostController) {
         `in`.melo.presentation.components.MeloGroupedList {
             val services = listOfNotNull(
                 stringResource(R.string.search_source_spotify).takeIf { discovery.spotifyEnabled },
-                stringResource(R.string.search_source_youtube).takeIf { google != null },
+                stringResource(R.string.music_server_title).takeIf { server != null },
             ).joinToString(" · ")
             val spotify = spotifyProfile.takeIf { discovery.spotifyEnabled }
             SettingsAccountRow(
-                title = spotify?.displayName ?: google?.name ?: stringResource(R.string.settings_accounts_title),
+                title = spotify?.displayName ?: stringResource(R.string.settings_accounts_title),
                 subtitle = services.ifEmpty { stringResource(R.string.settings_account_guest_subtitle) },
-                picture = { AccountPicture(spotify?.imageUrl ?: google?.photoUrl) },
+                picture = { AccountPicture(spotify?.imageUrl ?: null) },
                 onClick = { open("account") },
             )
         }
@@ -402,37 +402,6 @@ private fun PlaybackSettings(model: MeloModel, navController: NavHostController)
     val s by model.ui.settings.collectAsStateWithLifecycle()
     val update = model.ui::updateSettings
     SettingsScaffold(stringResource(R.string.settings_category_playback_title), navController) {
-        SettingsSection(
-            title = stringResource(R.string.settings_section_quality),
-            footer = stringResource(R.string.settings_quality_footer),
-        ) {
-            val rungs = `in`.melo.data.AudioQuality.entries.associate { rung ->
-                rung.key to stringResource(
-                    when (rung) {
-                        `in`.melo.data.AudioQuality.LOW -> R.string.audio_quality_low
-                        `in`.melo.data.AudioQuality.NORMAL -> R.string.audio_quality_normal
-                        `in`.melo.data.AudioQuality.HIGH -> R.string.audio_quality_high
-                        `in`.melo.data.AudioQuality.LOSSLESS -> R.string.audio_quality_lossless
-                    }
-                )
-            }
-            ThemeSelectorItem(
-                label = stringResource(R.string.settings_quality_wifi_title),
-                description = stringResource(R.string.settings_quality_description),
-                options = rungs,
-                selectedKey = `in`.melo.data.AudioQuality.of(s.streamingQualityWifi, `in`.melo.data.AudioQuality.WifiDefault).key,
-                onSelectionChanged = { key -> update { it.copy(streamingQualityWifi = key) } },
-                leadingIcon = { Icon(MeloIcons.Wifi, null, tint = MaterialTheme.colorScheme.secondary) },
-            )
-            ThemeSelectorItem(
-                label = stringResource(R.string.settings_quality_mobile_title),
-                description = stringResource(R.string.settings_quality_description),
-                options = rungs,
-                selectedKey = `in`.melo.data.AudioQuality.of(s.streamingQualityMobile, `in`.melo.data.AudioQuality.MobileDefault).key,
-                onSelectionChanged = { key -> update { it.copy(streamingQualityMobile = key) } },
-                leadingIcon = { Icon(MeloIcons.SignalCellularAlt, null, tint = MaterialTheme.colorScheme.secondary) },
-            )
-        }
         SettingsSection(title = stringResource(R.string.settings_section_audio)) {
             SettingsItem(
                 title = stringResource(R.string.settings_category_equalizer_title),
@@ -486,10 +455,8 @@ private fun BehaviorSettings(model: MeloModel, navController: NavHostController)
                 description = stringResource(R.string.settings_default_tab_subtitle),
                 options = mapOf(
                     AppSettings.TAB_HOME to stringResource(R.string.nav_bar_home),
-                    AppSettings.TAB_EXPLORE to stringResource(R.string.nav_bar_explore),
                     AppSettings.TAB_SEARCH to stringResource(R.string.nav_bar_search),
                     AppSettings.TAB_LIBRARY to stringResource(R.string.nav_bar_library),
-                    AppSettings.TAB_PODCASTS to stringResource(R.string.nav_bar_podcasts),
                 ),
                 selectedKey = s.defaultTab,
                 onSelectionChanged = { key -> update { it.copy(defaultTab = key) } },
@@ -732,10 +699,9 @@ private fun BackupSettings(model: MeloModel, navController: NavHostController) {
 private fun AccountSettings(model: MeloModel, navController: NavHostController) {
     val context = LocalContext.current
     val discovery by model.discovery.collectAsStateWithLifecycle()
-    val google by model.youTubeAccount.collectAsStateWithLifecycle()
+    val server by model.serverLibrary.collectAsStateWithLifecycle()
     val spotifyProfile by model.spotifyAccountProfile.collectAsStateWithLifecycle()
     var confirmSpotify by remember { mutableStateOf(false) }
-    var confirmGoogle by remember { mutableStateOf(false) }
     SettingsScaffold(stringResource(R.string.settings_accounts_title), navController) {
         `in`.melo.presentation.components.MeloGroupedList {
             if (discovery.spotifyEnabled) SettingsAccountRow(
@@ -751,18 +717,11 @@ private fun AccountSettings(model: MeloModel, navController: NavHostController) 
                 onClick = { model.showSignIn() },
                 trailingIcon = { SettingsChevron() },
             )
-            val account = google
-            if (account != null) SettingsAccountRow(
-                title = account.name,
-                subtitle = account.handle.ifBlank { stringResource(R.string.search_source_youtube) },
-                picture = { AccountPicture(account.photoUrl) },
-                onClick = { model.refreshYouTubeLibrary() },
-                trailing = { Icon(meloPainter(R.drawable.ic_source_youtube_music), null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) },
-            ) else SettingsItem(
-                title = stringResource(R.string.google_connect_title),
-                subtitle = stringResource(R.string.google_connect_subtitle),
-                leadingIcon = { Icon(meloPainter(R.drawable.ic_source_youtube_music), null, tint = MaterialTheme.colorScheme.secondary) },
-                onClick = { navController.navigateSafely(Screen.GoogleSignIn.route) },
+            SettingsItem(
+                title = stringResource(R.string.music_server_title),
+                subtitle = stringResource(if (server != null) R.string.music_server_settings else R.string.music_server_description),
+                leadingIcon = { Icon(MeloIcons.MusicNote, null, tint = MaterialTheme.colorScheme.secondary) },
+                onClick = { navController.navigateSafely(Screen.MusicServer.route) },
                 trailingIcon = { SettingsChevron() },
             )
         }
@@ -787,9 +746,8 @@ private fun AccountSettings(model: MeloModel, navController: NavHostController) 
                 trailingIcon = { SettingsChevron() },
             )
         }
-        if (discovery.spotifyEnabled || google != null) `in`.melo.presentation.components.MeloGroupedList {
+        if (discovery.spotifyEnabled) `in`.melo.presentation.components.MeloGroupedList {
             if (discovery.spotifyEnabled) SettingsDestructiveRow(stringResource(R.string.settings_logout_spotify)) { confirmSpotify = true }
-            if (google != null) SettingsDestructiveRow(stringResource(R.string.google_disconnect_title)) { confirmGoogle = true }
         }
     }
     if (confirmSpotify) SettingsConfirmDialog(
@@ -798,13 +756,6 @@ private fun AccountSettings(model: MeloModel, navController: NavHostController) 
         confirm = stringResource(R.string.settings_logout_title),
         onConfirm = { model.disconnectSpotify() },
         onDismiss = { confirmSpotify = false },
-    )
-    if (confirmGoogle) SettingsConfirmDialog(
-        title = stringResource(R.string.google_disconnect_confirm),
-        text = stringResource(R.string.google_disconnect_subtitle),
-        confirm = stringResource(R.string.google_disconnect_action),
-        onConfirm = { model.disconnectGoogle() },
-        onDismiss = { confirmGoogle = false },
     )
 }
 
@@ -817,7 +768,7 @@ private fun shelfName(shelf: `in`.melo.data.preferences.HomeShelf): String = str
     `in`.melo.data.preferences.HomeShelf.PLAYLISTS -> R.string.home_playlists
     `in`.melo.data.preferences.HomeShelf.MULTI_SERVICE -> R.string.home_multi_service
     `in`.melo.data.preferences.HomeShelf.SPOTIFY_PLAYLISTS -> R.string.home_spotify_playlists
-    `in`.melo.data.preferences.HomeShelf.YOUTUBE_PLAYLISTS -> R.string.home_youtube_playlists
+    `in`.melo.data.preferences.HomeShelf.SERVER_PLAYLISTS -> R.string.music_server_title
     `in`.melo.data.preferences.HomeShelf.ALBUMS -> R.string.home_albums
     `in`.melo.data.preferences.HomeShelf.ARTISTS -> R.string.home_artists
     `in`.melo.data.preferences.HomeShelf.LOCAL_FILES -> R.string.home_local_files

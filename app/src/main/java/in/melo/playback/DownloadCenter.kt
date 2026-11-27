@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import `in`.melo.data.server.MusicServer
+import `in`.melo.data.server.MusicServerUris
 import android.content.Intent
 import android.os.IBinder
 import android.os.SystemClock
@@ -72,14 +74,11 @@ object DownloadCenter {
             loaded = true
         }
         val executor = Executors.newFixedThreadPool(2)
-        // Every track is kept as its YouTube Music file. Those have no length before they are opened:
-        // the chain writes them whole. Earlier Spotify HLS requests only ever need removing, which a
-        // progressive downloader does by key; the sweep then releases their segments.
-        val youtubeWriter = CacheDataSource.Factory().setCache(cache(application)).setCacheKeyFactory(AudioCache.keys)
+        val serverWriter = CacheDataSource.Factory().setCache(cache(application)).setCacheKeyFactory(AudioCache.keys)
             .setUpstreamDataSourceFactory(CacheDataSource.Factory().setCache(AudioCache.cache(application)).setCacheKeyFactory(AudioCache.keys)
-                .setCacheWriteDataSinkFactory(null).setUpstreamDataSourceFactory(YouTubeDataSource.Factory(application)))
+                .setCacheWriteDataSinkFactory(null).setUpstreamDataSourceFactory(ServerAudioSource.factory(application)))
         val downloaders = DownloaderFactory { request ->
-            ProgressiveDownloader(MediaItem.Builder().setUri(request.uri).setCustomCacheKey(request.customCacheKey).build(), youtubeWriter, executor)
+            ProgressiveDownloader(MediaItem.Builder().setUri(request.uri).setCustomCacheKey(request.customCacheKey).build(), serverWriter, executor)
         }
         DownloadManager(application, DefaultDownloadIndex(AudioCache.database(application)), downloaders).also { created ->
             manager = created
@@ -95,9 +94,7 @@ object DownloadCenter {
                     val orphaned = mutableListOf<String>()
                     downloadManager.downloadIndex.getDownloads().use { cursor -> while (cursor.moveToNext()) {
                         val request = cursor.download.request
-                        // Spotify HLS files from the native-engine builds can no longer play:
-                        // drop them, and their collections queue them again from YouTube Music.
-                        if (request.id !in kept || request.uri.scheme != YouTubeUris.SCHEME) orphaned.add(request.id)
+                        if (request.id !in kept || !MusicServerUris.isPlayback(request.uri)) orphaned.add(request.id)
                     } }
                     orphaned.forEach(downloadManager::removeDownload)
                     save(); publish()
@@ -194,7 +191,8 @@ object DownloadCenter {
 
     fun enqueue(context: Context, item: Music, tracks: List<Music>, onFailure: () -> Unit = {}) {
         manager(context)
-        val spotify = tracks.filterNot(Music::isLocalTrack)
+        val library = MusicServer.get(context).library.value
+        val spotify = tracks.filter { MusicServerUris.playback(it, library) != null }
         if (spotify.isEmpty()) return
         records[item.id] = DownloadCollection(item, spotify)
         spotify.forEach { track ->
@@ -226,9 +224,8 @@ object DownloadCenter {
         val context = checkNotNull(app)
         try {
             withContext(Dispatchers.IO) { AudioIndex.get(context).describe(track, played = false) }
-            // YouTube Music tracks and Spotify tracks are both kept as their YouTube Music file.
-            val uri = checkNotNull(YouTubeUris.of(track))
-            val request = DownloadRequest.Builder(track.id, uri).setCustomCacheKey(YouTubeUris.cacheKey(track.id))
+            val uri = checkNotNull(MusicServerUris.playback(track, MusicServer.get(context).library.value))
+            val request = DownloadRequest.Builder(track.id, uri).setCustomCacheKey(AudioCache.key(MusicServerUris.fileKey(uri)))
                 .setData(encodePins(listOf(track)).toByteArray()).build()
             // A user can cancel a collection while it is being prepared.
             if (records.values.any { record -> record.tracks.any { it.id == track.id } }) {

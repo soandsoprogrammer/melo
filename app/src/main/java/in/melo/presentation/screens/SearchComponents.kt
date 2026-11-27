@@ -318,7 +318,7 @@ fun SearchResultHistoryList(
                             // Where the result comes from, as in the result list. A multi-service playlist has no single source.
                             val source = when {
                                 item.id.startsWith(`in`.melo.data.LOCAL_PLAYLIST_PREFIX) -> null
-                                item.id.startsWith(`in`.melo.data.youtube.YTM_PLAYLIST_PREFIX) -> `in`.melo.data.MusicSource.YouTubeMusic
+                                `in`.melo.data.server.MusicServerUris.isPlaylist(item.id) -> `in`.melo.data.MusicSource.MusicServer
                                 else -> `in`.melo.data.musicSourceOf(item.id)
                             }
                             if (source != null && `in`.melo.presentation.components.LocalSourceBadges.current) {

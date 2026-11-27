@@ -18,7 +18,6 @@
     <string name="playback_error_decode">无法解码收到的音频，请重试或换一首。</string>
     <string name="playback_error_output">无法启动音频输出，请检查音频设备后重试。</string>
     <string name="playback_error_generic">无法播放此曲目，请重试或换一首。</string>
-    <string name="playback_error_youtube_match">在 YouTube Music 中未找到此曲目。</string>
     <string name="lyrics_import_error_extension">仅支持 .lrc 和 .ttml 歌词文件。</string>
     <string name="lyrics_import_error_type">不支持所选歌词文件的格式。</string>
     <string name="lyrics_import_error_size">歌词文件过大。</string>

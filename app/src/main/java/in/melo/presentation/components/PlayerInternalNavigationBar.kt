@@ -369,11 +369,9 @@ private fun PlayerInternalNavigationItemsRow(
                         }
                     } else if (!isAlreadySelected) {
                         lastSearchTapTimestamp = 0L
-                        if (itemRoute == Screen.Home.route) `in`.melo.presentation.screens.HomeReselect.entered()
                         navController.navigateToTopLevelSafely(itemRoute)
                     } else {
                         lastSearchTapTimestamp = 0L
-                        if (itemRoute == Screen.Home.route) `in`.melo.presentation.screens.HomeReselect.request()
                     }
                 }
             }

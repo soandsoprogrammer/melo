@@ -46,8 +46,6 @@ import androidx.media3.transformer.VideoEncoderSettings
 import `in`.melo.data.canvas.CanvasArtwork
 import `in`.melo.data.model.Song
 import `in`.melo.data.model.toMusic
-import `in`.melo.playback.YouTubeDataSource
-import `in`.melo.playback.YouTubeUris
 import java.io.File
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -115,7 +113,7 @@ internal fun shareTimeline(lines: List<LyricsShareLine>): ShareTimeline? {
  * blurred colours, still. The cover loops underneath for as long as the lines take.
  *
  * When the lines are synced the video is the song itself: the stretches the lines are sung over
- * are cut from the same YouTube Music audio playback reads (a Spotify track is matched to it
+ * are cut from the same server audio playback reads (a Spotify track is matched to it
  * first), and [painter] is asked for the card with each line lit as the vocal reaches it. If the
  * audio can't be had the same video is made silent; unsynced lyrics get the still card, held for
  * [MIN_LENGTH_MS].
@@ -305,33 +303,16 @@ private object SongAudio
 /** Where the share video's audio is read from, and which stretches of it. */
 private class ShareAudio(val factory: DataSource.Factory, val uri: Uri, val timeline: ShareTimeline, val offsetMs: Long)
 
-/**
- * Where the song's audio is read from for a share: a file on the device from itself, anything
- * else from YouTube Music, the way playback reads it (a Spotify track is matched there first).
- */
+/** Uses the same server or device audio as playback. */
 @androidx.annotation.OptIn(UnstableApi::class)
 private fun songAudio(context: Context, song: Song): Pair<DataSource.Factory, Uri>? {
     if (song.isLocal) {
         val uri = (song.mediaUri ?: song.id).takeIf { it.isNotBlank() }?.let(Uri::parse) ?: return null
         return DefaultDataSource.Factory(context) to uri
     }
-    val music = song.toMusic()
-    val uri = runCatching { YouTubeUris.of(music) }.getOrNull() ?: shareMatch(music) ?: return null
-    return YouTubeDataSource.Factory(context) to uri
-}
-
-/**
- * A song that plays from neither YouTube Music nor Spotify (an add-on's) is matched on YouTube
- * Music by its title, artists and length, for the share alone. It is kept under a key of its own
- * so the match and its file stay apart from the song's own entry in the audio index.
- */
-private fun shareMatch(music: `in`.melo.data.Music): Uri? {
-    if (music.title.isBlank()) return null
-    val key = "share:" + java.util.UUID.nameUUIDFromBytes(music.id.toByteArray())
-    return Uri.Builder().scheme(YouTubeUris.SCHEME).authority("match").appendPath(key)
-        .appendQueryParameter("title", music.title).appendQueryParameter("artists", music.subtitle)
-        .appendQueryParameter("duration", music.durationMs.toString()).appendQueryParameter("album", music.album)
-        .build()
+    val server = `in`.melo.data.server.MusicServer.get(context)
+    val uri = `in`.melo.data.server.MusicServerUris.playback(song.toMusic(), server.library.value) ?: return null
+    return `in`.melo.playback.ServerAudioSource.factory(context) to uri
 }
 
 @androidx.annotation.OptIn(UnstableApi::class)

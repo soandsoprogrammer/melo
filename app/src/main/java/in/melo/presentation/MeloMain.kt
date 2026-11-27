@@ -97,7 +97,6 @@ fun MeloMain(model: MeloModel, pendingSharedLink: String? = null, onSharedLinkHa
     val account by model.account.collectAsStateWithLifecycle()
     val guest by model.guest.collectAsStateWithLifecycle()
     val online by model.online.collectAsStateWithLifecycle()
-    // Signing in is optional: a guest uses local files, YouTube Music and multi-service playlists.
     if (!discovery.spotifyEnabled && !guest) {
         if (account.restoring) {
             Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
@@ -107,14 +106,10 @@ fun MeloMain(model: MeloModel, pendingSharedLink: String? = null, onSharedLinkHa
         return
     }
     var returnedFromBackground by remember { mutableStateOf(false) }
-    var appInForeground by remember { mutableStateOf(true) }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-        appInForeground = false
         returnedFromBackground = true
-        model.cancelNavigationWarmup()
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        appInForeground = true
         if (returnedFromBackground) model.refreshLibrary()
         returnedFromBackground = false
     }
@@ -145,28 +140,16 @@ fun MeloMain(model: MeloModel, pendingSharedLink: String? = null, onSharedLinkHa
     val commonNavItems = remember {
         persistentListOf(
             BottomNavItem("Home", R.string.nav_bar_home, R.drawable.rounded_home_24, R.drawable.home_24_rounded_filled, Screen.Home),
-            BottomNavItem("Explore", R.string.nav_bar_explore, R.drawable.ic_explore_24, R.drawable.ic_explore_24, Screen.Explore),
             BottomNavItem("Search", R.string.nav_bar_search, R.drawable.rounded_search_24, R.drawable.rounded_search_24, Screen.Search),
             BottomNavItem("Library", R.string.nav_bar_library, R.drawable.rounded_library_music_24, R.drawable.round_library_music_24, Screen.Library),
-            BottomNavItem("Podcasts", R.string.nav_bar_podcasts, R.drawable.rounded_headphones_24, R.drawable.rounded_headphones_24, Screen.Podcasts),
         )
     }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    LaunchedEffect(model, online, appInForeground, currentRoute) {
-        model.cancelNavigationWarmup()
-        if (online && appInForeground) {
-            val onExplore = currentRoute == Screen.Explore.route
-            model.scheduleNavigationWarmup(
-                includeLastArtist = !onExplore,
-                includeExploreArtwork = !onExplore,
-            )
-        }
-    }
     var isSearchBarActive by remember { mutableStateOf(false) }
     val routesWithHiddenNavigationBar = remember {
         setOf(Screen.Settings.route, Screen.Equalizer.route, Screen.SettingsCategory.route, Screen.PlaylistDetail.route, Screen.AlbumDetail.route,
-            Screen.ArtistDetail.route, Screen.PodcastDetail.route, Screen.Convert.route, Screen.GoogleSignIn.route, Screen.DiscordLogin.route)
+            Screen.ArtistDetail.route, Screen.Convert.route, Screen.DiscordLogin.route, Screen.MusicServer.route)
     }
     val shouldHideNavigationBar by remember(currentRoute, isSearchBarActive) {
         derivedStateOf {
@@ -244,7 +227,7 @@ fun MeloMain(model: MeloModel, pendingSharedLink: String? = null, onSharedLinkHa
     val surfaceStyle = `in`.melo.ui.glass.LocalMeloSurface.current.style
     // A sign-in page is a WebView: recorded into the glass layers, its surface is drawn twice and
     // blinks every other frame. Nothing on those pages is glass, so the recording pauses there.
-    val onWebPage = currentRoute == Screen.GoogleSignIn.route || currentRoute == Screen.DiscordLogin.route
+    val onWebPage = currentRoute == Screen.DiscordLogin.route
     val recordBackdrop = surfaceStyle != `in`.melo.ui.glass.MeloSurfaceStyle.SOLID && `in`.melo.ui.glass.isGlassSupported() &&
         !onWebPage
     // The colour background: soft blobs in the playing song's colour (the colour of the chosen

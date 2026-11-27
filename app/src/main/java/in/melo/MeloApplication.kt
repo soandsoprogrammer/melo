@@ -21,9 +21,6 @@ class MeloApplication : Application(), ImageLoaderFactory {
         `in`.melo.data.diagnostics.DiagnosticLog.catchCrashes()
         `in`.melo.data.diagnostics.DiagnosticLog.recordPastExits(this)
         NetworkMonitor.start(this)
-        `in`.melo.data.youtube.YouTubeMusic.init(this)
-        `in`.melo.data.youtube.TrackMatcher.init(this)
-        `in`.melo.data.youtube.YouTubeAccount.init(this)
     }
 
     /** Covers stay on disk whatever the CDN's cache headers say: they never change for a given address. */

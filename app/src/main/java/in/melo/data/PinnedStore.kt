@@ -26,7 +26,7 @@ class PinnedStore(context: Context) {
     }
 
     /**
-     * Takes [item] off whichever dial it is on: unpinned, and kept off even where YouTube's own
+     * Takes [item] off whichever dial it is on: unpinned, and kept off even where the
      * speed dial, what was played or the mixes would put it back, until it is pinned again.
      */
     fun removeFromDial(item: Music) {

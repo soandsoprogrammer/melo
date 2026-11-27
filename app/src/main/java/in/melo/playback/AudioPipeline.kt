@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.update
  * not the track, and are read where they are shown.
  */
 internal object AudioPipeline {
-    enum class SourceKind { None, YouTube, Addon, Device }
+    enum class SourceKind { None, Server, Addon, Device }
 
     data class Snapshot(
         val sourceKind: SourceKind = SourceKind.None,
@@ -132,12 +132,11 @@ internal class AudioPipelineTracker(private val player: Player) : AnalyticsListe
         val id = item?.mediaId
         val uri = item?.localConfiguration?.uri
         val addon: ResolvedStream? = id?.let { AddonPlayback.served[it] }
-            ?: if (id != null && LosslessUpgrade.isMarked(uri)) LosslessUpgrade.streamFor(id) else null
         val kind = when {
             item == null -> AudioPipeline.SourceKind.None
             addon != null -> AudioPipeline.SourceKind.Addon
             uri?.scheme == "content" || uri?.scheme == "file" -> AudioPipeline.SourceKind.Device
-            else -> AudioPipeline.SourceKind.YouTube
+            else -> AudioPipeline.SourceKind.Server
         }
         val format = addon?.format
         AudioPipeline.update {

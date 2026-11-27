@@ -40,7 +40,7 @@ internal object AddonPlayback {
 /**
  * Builds the source an add-on answer plays through: a plain file, a DASH manifest
  * or an HLS playlist, read straight from the add-on's host and never cached as
- * the track's YouTube audio. Protected content is refused: no DRM session exists.
+ * the original audio. Protected content is refused: no DRM session exists.
  */
 @UnstableApi
 internal class AddonStreamSources {
@@ -61,7 +61,7 @@ internal class AddonStreamSources {
                     StreamTransport.File -> null
                 },
             )
-            // Each answer is its own file: a shared key would mix it with the YouTube copy.
+            // Each answer is its own file: a shared key would mix it with the original.
             .setCustomCacheKey(null)
             .build()
         val factory: MediaSource.Factory = when (transport) {

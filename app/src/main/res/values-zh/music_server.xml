@@ -20,4 +20,6 @@
     <string name="music_server_error_credentials">请检查服务器用户名和密码。</string>
     <string name="music_server_error_connection">无法连接服务器，请检查地址和网络。</string>
     <string name="music_server_error_response">服务器未能完成请求。</string>
+    <string name="music_server_delete_playlist">从音乐服务器删除「%1$s」？</string>
+    <string name="music_server_no_match">音乐服务器中没有找到这首歌的对应版本。</string>
 </resources>
