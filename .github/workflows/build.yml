@@ -43,16 +43,6 @@ jobs:
       - name: Compile debug, release and device tests
         run: ./gradlew --no-daemon :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest
 
-      - name: Upload test and lint reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: |
-            app/build/reports/tests/
-            app/build/reports/lint-results-debug.html
-          if-no-files-found: ignore
-
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -81,3 +71,13 @@ jobs:
 
       - name: Test and lint
         run: ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug
+
+      - name: Upload test and lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
